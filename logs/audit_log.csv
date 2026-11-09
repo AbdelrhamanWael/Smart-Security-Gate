@@ -1,0 +1,35 @@
+timestamp,user_id,role,level_reached,command,outcome,details
+2026-11-08T12:14:57.615915+00:00,Anonymous,Unauthenticated,0,open,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T12:14:57.616361+00:00,impostor1,Unauthenticated,0,status,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T12:14:57.616692+00:00,member1,Super Admin,2,open,SUCCESS,SUCCESS: Gate / Vault UNLOCKED. Entry granted.
+2026-11-08T12:14:57.617002+00:00,member1,Super Admin,2,logs,SUCCESS,SUCCESS: Audit logs retrieved and displayed for security inspection.
+2026-11-08T12:14:57.617786+00:00,member2,Operator,2,open,SUCCESS,SUCCESS: Gate / Vault UNLOCKED. Entry granted.
+2026-11-08T12:14:57.618106+00:00,member2,Operator,2,logs,PERMISSION_DENIED,"User 'member2' (Operator) does not have permission for 'logs'. Allowed: ['open', 'lock', 'status']"
+2026-11-08T12:14:57.618416+00:00,member3,Auditor,2,logs,SUCCESS,SUCCESS: Audit logs retrieved and displayed for security inspection.
+2026-11-08T12:14:57.618700+00:00,member3,Auditor,2,open,PERMISSION_DENIED,"User 'member3' (Auditor) does not have permission for 'open'. Allowed: ['logs', 'status']"
+2026-11-08T12:14:57.618970+00:00,member1,Super Admin,2,unknown,REJECTED_UNKNOWN,Audio could not be recognized as a valid command.
+2026-11-08T12:52:21.737908+00:00,Anonymous,Unauthenticated,0,open,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T12:52:21.738630+00:00,impostor1,Unauthenticated,0,status,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T12:52:21.739073+00:00,member1,Super Admin,2,open,SUCCESS,SUCCESS: Gate / Vault UNLOCKED. Entry granted.
+2026-11-08T12:52:21.739438+00:00,member1,Super Admin,2,logs,SUCCESS,SUCCESS: Audit logs retrieved and displayed for security inspection.
+2026-11-08T12:52:21.739827+00:00,member2,Operator,2,open,SUCCESS,SUCCESS: Gate / Vault UNLOCKED. Entry granted.
+2026-11-08T12:52:21.740169+00:00,member2,Operator,2,logs,PERMISSION_DENIED,"User 'member2' (Operator) does not have permission for 'logs'. Allowed: ['open', 'lock', 'status']"
+2026-11-08T12:52:21.740699+00:00,member3,Auditor,2,logs,SUCCESS,SUCCESS: Audit logs retrieved and displayed for security inspection.
+2026-11-08T12:52:21.742043+00:00,member3,Auditor,2,open,PERMISSION_DENIED,"User 'member3' (Auditor) does not have permission for 'open'. Allowed: ['logs', 'status']"
+2026-11-08T12:52:21.742433+00:00,member1,Super Admin,2,unknown,REJECTED_UNKNOWN,Audio could not be recognized as a valid command.
+2026-11-08T14:02:30.726613+00:00,Anonymous,Unauthenticated,0,open,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T14:02:30.726984+00:00,impostor1,Unauthenticated,0,status,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T17:36:37.565509+00:00,Anonymous,Unauthenticated,0,open,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T17:36:37.572523+00:00,member1,Super Admin,2,logs,SUCCESS,SUCCESS: Audit logs retrieved and displayed for security inspection.
+2026-11-08T17:36:37.573187+00:00,member2,Operator,2,open,SUCCESS,SUCCESS: Gate / Vault UNLOCKED. Entry granted.
+2026-11-08T17:36:37.573641+00:00,member2,Operator,2,logs,PERMISSION_DENIED,"User 'member2' (Operator) does not have permission for 'logs'. Allowed: ['open', 'lock', 'status']"
+2026-11-08T17:36:37.573981+00:00,member3,Auditor,2,open,PERMISSION_DENIED,"User 'member3' (Auditor) does not have permission for 'open'. Allowed: ['logs', 'status']"
+2026-11-08T17:43:16.807101+00:00,Anonymous,Unauthenticated,0,open,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T17:43:16.807814+00:00,impostor1,Unauthenticated,0,status,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T17:46:15.572179+00:00,Anonymous,Unauthenticated,0,open,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T17:46:15.572542+00:00,impostor1,Unauthenticated,0,status,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T17:47:13.007825+00:00,Anonymous,Unauthenticated,0,open,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-08T17:47:13.008418+00:00,member1,Super Admin,2,logs,SUCCESS,SUCCESS: Audit logs retrieved and displayed for security inspection.
+2026-11-08T17:47:13.008964+00:00,member2,Operator,2,open,SUCCESS,SUCCESS: Gate / Vault UNLOCKED. Entry granted.
+2026-11-08T17:47:13.009449+00:00,member2,Operator,2,logs,PERMISSION_DENIED,"User 'member2' (Operator) does not have permission for 'logs'. Allowed: ['open', 'lock', 'status']"
+2026-11-08T17:47:13.009903+00:00,member3,Auditor,2,open,PERMISSION_DENIED,"User 'member3' (Auditor) does not have permission for 'open'. Allowed: ['logs', 'status']"

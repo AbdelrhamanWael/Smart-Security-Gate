@@ -1,0 +1,23 @@
+# Python Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python Bytecode and Caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+cache/
+tmp/
+
+# Archives & Temporary Duplicate Folders
+*.rar
+*.zip
+*.tar.gz
+mini project/
+
+# OS specific files
+.DS_Store
+Thumbs.db
