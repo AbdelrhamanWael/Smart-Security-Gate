@@ -41,3 +41,11 @@ timestamp,user_id,role,level_reached,command,outcome,details
 2026-11-10T05:38:17.071856+00:00,member1,Super Admin,0,logs,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
 2026-11-10T05:38:17.112385+00:00,member1,Super Admin,1,logs,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
 2026-11-10T05:38:17.175147+00:00,member1,Super Admin,2,logs,SUCCESS,SUCCESS: Audit logs retrieved and displayed for security inspection.
+2026-11-10 08:29:11,member1,False,1,1.0000,N/A,0.0000,N/A,ACCESS DENIED,Unverified Intruder,388.8
+2026-11-10 08:29:37,member1,False,1,1.0000,N/A,0.0000,N/A,ACCESS DENIED,Unverified Intruder,56.6
+2026-11-10 08:29:38,member1,False,1,1.0000,N/A,0.0000,N/A,ACCESS DENIED,Unverified Intruder,53.9
+2026-11-10 08:29:39,member1,False,1,1.0000,N/A,0.0000,N/A,ACCESS DENIED,Unverified Intruder,51.0
+2026-11-10 08:29:39,member1,False,1,1.0000,N/A,0.0000,N/A,ACCESS DENIED,Unverified Intruder,57.4
+2026-11-10 08:29:41,member1,False,1,1.0000,N/A,0.0000,N/A,ACCESS DENIED,Unverified Intruder,61.9
+2026-11-10 08:29:42,member1,False,1,1.0000,N/A,0.0000,N/A,ACCESS DENIED,Unverified Intruder,54.1
+2026-11-10 08:29:42,member1,False,1,1.0000,N/A,0.0000,N/A,ACCESS DENIED,Unverified Intruder,49.2

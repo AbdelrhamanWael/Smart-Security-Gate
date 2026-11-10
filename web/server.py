@@ -251,6 +251,43 @@ def get_presets():
     }
 
 
+@app.get("/api/dataset/files")
+def get_dataset_files():
+    """Returns curated lists of files from data/ directory for dropdown selection."""
+    import glob
+
+    def scan_curated(pattern, max_items=10):
+        found = sorted(glob.glob(pattern, recursive=True))
+        return [f.replace("\\", "/") for f in found[:max_items]]
+
+    return {
+        "faces": [
+            {"label": "Member 1 - Genuine (Session 1)", "path": "data/face/member1/session1/img_000.jpg", "category": "genuine_m1"},
+            {"label": "Member 1 - Genuine (Session 2)", "path": "data/face/member1/session2/img_000.jpg", "category": "genuine_m1"},
+            {"label": "Member 2 - Genuine (Session 1)", "path": "data/face/member2/session1/img_000.jpg", "category": "genuine_m2"},
+            {"label": "Member 2 - Genuine (Session 2)", "path": "data/face/member2/session2/img_000.jpg", "category": "genuine_m2"},
+            {"label": "Impostor Face 1 (Ariel Sharon)", "path": "data/face/impostors/Ariel_Sharon/session1/img_000.jpg", "category": "impostor"},
+            {"label": "Impostor Face 2 (Colin Powell)", "path": "data/face/impostors/Colin_Powell/session1/img_000.jpg", "category": "impostor"},
+        ],
+        "voices": [
+            {"label": "Member 1 - Genuine (Passphrase 01)", "path": "data/voice/member1/session1/passphrase_01.wav", "category": "genuine_m1"},
+            {"label": "Member 1 - Genuine (Passphrase 02)", "path": "data/voice/member1/session2/passphrase_01.wav", "category": "genuine_m1"},
+            {"label": "Member 2 - Genuine (Passphrase 01)", "path": "data/voice/member2/session1/passphrase_01.wav", "category": "genuine_m2"},
+            {"label": "Member 2 - Genuine (Passphrase 02)", "path": "data/voice/member2/session2/passphrase_01.wav", "category": "genuine_m2"},
+            {"label": "Impostor Voice 1 (Unseen Attacker)", "path": "data/voice/impostor1/session1/passphrase_01.wav", "category": "impostor"},
+            {"label": "Impostor Voice 2 (Unseen Attacker)", "path": "data/voice/impostor2/session1/passphrase_01.wav", "category": "impostor"},
+        ],
+        "fingerprints": [
+            {"label": "Member 1 - Genuine Ridge (Session 1)", "path": "data/fingerprint/member1/session1/img_001.jpg", "category": "genuine_m1"},
+            {"label": "Member 1 - Genuine Ridge (Session 2)", "path": "data/fingerprint/member1/session2/img_001.jpg", "category": "genuine_m1"},
+            {"label": "Member 2 - Genuine Ridge (Session 1)", "path": "data/fingerprint/member2/session1/img_001.jpg", "category": "genuine_m2"},
+            {"label": "Member 2 - Genuine Ridge (Session 2)", "path": "data/fingerprint/member2/session2/img_001.jpg", "category": "genuine_m2"},
+            {"label": "Impostor Fingerprint 1", "path": "data/fingerprint/impostors/finger_104/session1/img_001.jpg", "category": "impostor"},
+            {"label": "Impostor Fingerprint 2", "path": "data/fingerprint/impostors/finger_105/session1/img_001.jpg", "category": "impostor"},
+        ],
+    }
+
+
 @app.post("/api/verify/face")
 async def api_verify_face(request: Request):
     """Verifies a single face attempt (Level 1 / Mode A)."""
@@ -599,6 +636,7 @@ def execute_gate_action(action: str = Form(...), token: Optional[str] = None):
 
 # Mount Static Files
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+app.mount("/data", StaticFiles(directory=str(ROOT_DIR / "data")), name="data")
 
 @app.get("/")
 def serve_index():

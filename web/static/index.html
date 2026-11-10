@@ -94,22 +94,65 @@
             </span>
             <span id="badgeFace" class="stage-badge">STANDBY</span>
           </div>
-          <div class="camera-container">
-            <video id="webcamVideo" autoplay playsinline muted></video>
-            <canvas id="capturedFaceCanvas" class="preview-canvas" style="display: none;"></canvas>
-            <img id="presetFaceImg" class="preview-canvas" style="display: none;" alt="Face Preset" />
-            <div class="radar-scan-overlay"></div>
-            <div id="radarLine" class="radar-scan-line"></div>
+
+          <!-- Modality Input Tabs -->
+          <div class="modality-tab-bar">
+            <button id="faceTabLive" class="modality-tab-btn active" onclick="setFaceInputMode('live')">
+              <span>📹</span> كاميرا حية (Webcam)
+            </button>
+            <button id="faceTabUpload" class="modality-tab-btn" onclick="setFaceInputMode('upload')">
+              <span>📂</span> رفع صورة من جهازك
+            </button>
+            <button id="faceTabDataset" class="modality-tab-btn" onclick="setFaceInputMode('dataset')">
+              <span>📋</span> اختيار من الداتا
+            </button>
           </div>
-          <div class="stage-actions">
-            <button id="btnStartCamera" class="btn-primary" onclick="toggleCamera()">
-              <span>📹</span> Start Webcam
+
+          <!-- Video / Radar / Preview Box -->
+          <div class="camera-container">
+            <video id="webcamVideo" autoplay playsinline muted style="display: none;"></video>
+            <canvas id="capturedFaceCanvas" class="preview-canvas" style="display: none;"></canvas>
+            <img id="presetFaceImg" class="preview-canvas" style="display: none;" alt="Face Preview" />
+            
+            <div id="camPlaceholder" class="camera-placeholder">
+              <div class="cam-icon">📷</div>
+              <div style="font-size: 13px; font-weight: 600;">الكاميرا متوقفة حالياً</div>
+              <div style="font-size: 11px;">اضغط على "تشغيل الكاميرا" للبدء أو اختر صورة</div>
+            </div>
+
+            <div class="radar-scan-overlay"></div>
+            <div id="radarLine" class="radar-scan-line" style="display: none;"></div>
+          </div>
+
+          <!-- Sub-panel for File Upload -->
+          <div id="faceUploadSection" class="file-upload-container" style="display: none;">
+            <input type="file" id="faceFileInput" accept="image/*" style="display: none;" onchange="handleFaceFileUpload(event)">
+            <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="document.getElementById('faceFileInput').click()">
+              <span>📂</span> اختر ملف صورة (JPG / PNG) من جهازك
             </button>
-            <button id="btnCaptureFace" class="btn-secondary" onclick="captureFaceSnapshot()">
-              <span>📸</span> Capture Snapshot
-            </button>
-            <button class="btn-secondary" onclick="loadSampleFace()">
-              <span>📁</span> Use Sample File
+            <div id="facePickedName" class="file-picked-label" style="display: none;"></div>
+          </div>
+
+          <!-- Sub-panel for Dataset Selection Dropdown -->
+          <div id="faceDatasetSection" class="file-upload-container" style="display: none;">
+            <label style="font-size: 11px; color: var(--text-muted);">اختر عينة مباشرة من مجلد data/face/:</label>
+            <select id="faceSelectDropdown" class="select-dropdown" onchange="handleFaceDropdownSelect(this)">
+              <option value="">-- اختر ملف من الداتا --</option>
+            </select>
+          </div>
+
+          <!-- Stage Actions -->
+          <div class="stage-actions" style="margin-top: 14px; justify-content: space-between;">
+            <div style="display: flex; gap: 8px;">
+              <button id="btnStartCamera" class="btn-primary" onclick="toggleCamera()">
+                <span>📹</span> تشغيل الكاميرا
+              </button>
+              <button id="btnCaptureFace" class="btn-secondary" style="display: none;" onclick="captureFaceSnapshot()">
+                <span>📸</span> التقاط لقطة
+              </button>
+            </div>
+            <button class="btn-test-single" onclick="verifySingleModality('face')">
+              <span>🔍</span> فحص الوجه فقط
             </button>
           </div>
         </div>
@@ -122,18 +165,51 @@
             </span>
             <span id="badgeVoice" class="stage-badge">STANDBY</span>
           </div>
+
+          <!-- Modality Input Tabs -->
+          <div class="modality-tab-bar">
+            <button id="voiceTabLive" class="modality-tab-btn active" onclick="setVoiceInputMode('live')">
+              <span>🎤</span> مايكروفون حي (Live Mic)
+            </button>
+            <button id="voiceTabUpload" class="modality-tab-btn" onclick="setVoiceInputMode('upload')">
+              <span>📂</span> رفع ملف صوت (WAV)
+            </button>
+            <button id="voiceTabDataset" class="modality-tab-btn" onclick="setVoiceInputMode('dataset')">
+              <span>📋</span> اختيار من الداتا
+            </button>
+          </div>
+
           <div class="audio-visual-box">
             <canvas id="voiceWaveCanvas" class="mic-wave-canvas"></canvas>
-            <div id="voiceStatusText" style="position: absolute; font-size: 12px; font-family: var(--font-mono); color: var(--accent-cyan);">
-              Ready: Say 'Open security gate now'
+            <div id="voiceStatusText" style="position: absolute; font-size: 12px; font-family: var(--font-mono); color: var(--accent-cyan); text-align: center; padding: 0 10px;">
+              جاهز: انطق عبارة "Open security gate now"
             </div>
           </div>
-          <div class="stage-actions">
-            <button id="btnRecordVoice" class="btn-primary" onclick="toggleAudioRecording()">
-              <span>🎤</span> Record Passphrase (2.5s)
+
+          <!-- Sub-panel for Audio File Upload -->
+          <div id="voiceUploadSection" class="file-upload-container" style="display: none;">
+            <input type="file" id="voiceFileInput" accept="audio/*" style="display: none;" onchange="handleVoiceFileUpload(event)">
+            <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="document.getElementById('voiceFileInput').click()">
+              <span>📂</span> اختر ملف صوتي (WAV / OGG) من جهازك
             </button>
-            <button class="btn-secondary" onclick="loadSampleVoice()">
-              <span>📁</span> Use Sample Voice
+            <div id="voicePickedName" class="file-picked-label" style="display: none;"></div>
+          </div>
+
+          <!-- Sub-panel for Dataset Selection Dropdown -->
+          <div id="voiceDatasetSection" class="file-upload-container" style="display: none;">
+            <label style="font-size: 11px; color: var(--text-muted);">اختر عينة مباشرة من مجلد data/voice/:</label>
+            <select id="voiceSelectDropdown" class="select-dropdown" onchange="handleVoiceDropdownSelect(this)">
+              <option value="">-- اختر ملف صوتي من الداتا --</option>
+            </select>
+          </div>
+
+          <!-- Stage Actions -->
+          <div class="stage-actions" style="margin-top: 14px; justify-content: space-between;">
+            <button id="btnRecordVoice" class="btn-primary" onclick="toggleAudioRecording()">
+              <span>🎤</span> تسجيل صوتي (2.5 ثانية)
+            </button>
+            <button class="btn-test-single" onclick="verifySingleModality('voice')">
+              <span>🔍</span> فحص الصوت فقط
             </button>
           </div>
         </div>
@@ -146,20 +222,54 @@
             </span>
             <span id="badgeFp" class="stage-badge">STANDBY</span>
           </div>
+
+          <!-- Modality Input Tabs -->
+          <div class="modality-tab-bar">
+            <button id="fpTabUpload" class="modality-tab-btn active" onclick="setFpInputMode('upload')">
+              <span>📂</span> رفع بصمة من جهازك
+            </button>
+            <button id="fpTabDataset" class="modality-tab-btn" onclick="setFpInputMode('dataset')">
+              <span>📋</span> اختيار من الداتا
+            </button>
+          </div>
+
           <div class="fingerprint-box">
-            <img id="fpPreviewImg" class="fingerprint-img-preview" src="/static/img/fingerprint_placeholder.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2300e5ff\' stroke-width=\'1.5\'><path d=\'M12 2a10 10 0 0 0-10 10c0 5.5 4.5 10 10 10s10-4.5 10-10A10 10 0 0 0 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z\'/><path d=\'M12 6a6 6 0 0 0-6 6c0 3.3 2.7 6 6 6s6-2.7 6-6a6 6 0 0 0-6-6zm0 10c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z\'/></svg>'">
+            <img id="fpPreviewImg" class="fingerprint-img-preview" src="" style="display: none;">
+            <div id="fpPlaceholder" class="camera-placeholder">
+              <div class="cam-icon">👆</div>
+              <div style="font-size: 12px;">لم يتم اختيار صورة بصمة بعد</div>
+            </div>
             <div id="fpScanLine" class="radar-scan-line" style="display: none;"></div>
           </div>
-          <div class="stage-actions">
-            <button class="btn-secondary" onclick="loadSampleFingerprint()">
-              <span>📁</span> Load Enrolled Fingerprint
+
+          <!-- Sub-panel for Fingerprint File Upload -->
+          <div id="fpUploadSection" class="file-upload-container">
+            <input type="file" id="fpFileInput" accept="image/*" style="display: none;" onchange="handleFpFileUpload(event)">
+            <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="document.getElementById('fpFileInput').click()">
+              <span>📂</span> اختر ملف صورة بصمة من جهازك
+            </button>
+            <div id="fpPickedName" class="file-picked-label" style="display: none;"></div>
+          </div>
+
+          <!-- Sub-panel for Dataset Selection Dropdown -->
+          <div id="fpDatasetSection" class="file-upload-container" style="display: none;">
+            <label style="font-size: 11px; color: var(--text-muted);">اختر عينة مباشرة من مجلد data/fingerprint/:</label>
+            <select id="fpSelectDropdown" class="select-dropdown" onchange="handleFpDropdownSelect(this)">
+              <option value="">-- اختر ملف بصمة من الداتا --</option>
+            </select>
+          </div>
+
+          <!-- Stage Actions -->
+          <div class="stage-actions" style="margin-top: 14px; justify-content: flex-end;">
+            <button class="btn-test-single" onclick="verifySingleModality('fingerprint')">
+              <span>🔍</span> فحص البصمة فقط
             </button>
           </div>
         </div>
 
         <!-- Run Cascade Action Button -->
         <button id="btnRunCascade" class="btn-cascade-full" onclick="executeFullCascade()">
-          🚀 Execute Hierarchical Verification (Cascade Mode D)
+          🚀 تنفيذ الفحص الهرمي المتتابع (Cascade Mode D)
         </button>
       </div>
 
