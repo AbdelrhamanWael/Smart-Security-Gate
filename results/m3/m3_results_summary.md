@@ -1,5 +1,5 @@
 # Member 3: Early Fusion, Hierarchy & Evaluation Results
-Generated: 2026-11-10 06:59:02  |  users evaluated: member1, member2  |  **skipped (missing modality data): member3**
+Generated: 2026-11-10 07:59:05  |  users evaluated: member1, member2  |  **skipped (missing modality data): member3**
 ## Protocol
 - **DEV** (training, tuning, threshold freezing): genuine sessions 1-2 + *seen* impostor identities.
 - **TEST** (all numbers below): genuine session 3 (raw images only) + *unseen* impostor identities (open set).
@@ -66,20 +66,20 @@ Generated: 2026-11-10 06:59:02  |  users evaluated: member1, member2  |  **skipp
 
 | User | Measured ms (face / voice+fusion / fp) | Flat face+voice | Hier. D (intruder / genuine / 50-50) | Flat all 3 | Hier. D+FP (intruder / genuine / 50-50) |
 |---|---|---|---|---|---|
-| member1 (compute) | 27 / 4 / 15 | 0.031 | 0.027 / 0.031 / 0.029 | 0.045 | 0.027 / 0.044 / 0.036 |
-| member1 (with capture) | 27 / 4 / 15 | 3.031 | 0.067 / 3.031 / 1.549 | 5.045 | 0.067 / 4.911 / 2.489 |
-| member2 (compute) | 32 / 4 / 16 | 0.036 | 0.032 / 0.034 / 0.033 | 0.051 | 0.032 / 0.043 / 0.037 |
-| member2 (with capture) | 32 / 4 / 16 | 3.036 | 0.112 / 2.034 / 1.073 | 5.051 | 0.112 / 3.109 / 1.611 |
+| member1 (compute) | 140 / 6 / 31 | 0.146 | 0.140 / 0.146 / 0.143 | 0.176 | 0.140 / 0.174 / 0.157 |
+| member1 (with capture) | 140 / 6 / 31 | 3.146 | 0.180 / 3.146 / 1.663 | 5.176 | 0.180 / 5.041 / 2.610 |
+| member2 (compute) | 42 / 5 / 21 | 0.047 | 0.042 / 0.045 / 0.044 | 0.069 | 0.042 / 0.057 / 0.049 |
+| member2 (with capture) | 42 / 5 / 21 | 3.047 | 0.122 / 2.045 / 1.084 | 5.069 | 0.122 / 3.124 / 1.623 |
 
 ### 4.2 Level-1 threshold policy ablation (frozen on DEV)
 | User | T_low policy | T_low | FAR | FRR | Accuracy | Impostors stopped at L1 | Avg intruder time with capture (s) |
 |---|---|---|---|---|---|---|---|
-| member1 | lenient | 0.828 | 0.0% | 6.7% | 98.9% | 99% | 0.07 |
-| member1 | eer | 0.828 | 0.0% | 6.7% | 98.9% | 99% | 0.07 |
-| member1 | far1 | 1.000 | 0.0% | 100.0% | 83.3% | 100% | 0.03 |
-| member2 | lenient | 0.000 | 0.0% | 26.7% | 95.6% | 0% | 3.04 |
-| member2 | eer | 0.721 | 0.0% | 46.7% | 92.2% | 97% | 0.11 |
-| member2 | far1 | 1.000 | 0.0% | 100.0% | 83.3% | 100% | 0.03 |
+| member1 | lenient | 0.828 | 0.0% | 6.7% | 98.9% | 99% | 0.18 |
+| member1 | eer | 0.828 | 0.0% | 6.7% | 98.9% | 99% | 0.18 |
+| member1 | far1 | 1.000 | 0.0% | 100.0% | 83.3% | 100% | 0.14 |
+| member2 | lenient | 0.000 | 0.0% | 26.7% | 95.6% | 0% | 3.05 |
+| member2 | eer | 0.721 | 0.0% | 46.7% | 92.2% | 97% | 0.12 |
+| member2 | far1 | 1.000 | 0.0% | 100.0% | 83.3% | 100% | 0.04 |
 
 `lenient` = highest threshold with DEV FRR <= 2% (almost no genuine user rejected early), `eer` = EER point, `far1` = lowest threshold with DEV FAR <= 1%.
 
