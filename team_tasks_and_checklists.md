@@ -28,16 +28,16 @@ Tick when done **and** verified by a teammate.
 ### Core requirements
 - [x] Face: at least 2 feature methods (HOG + LBP, optionally PCA) , **M1**
 - [x] Voice: MFCC + ZCR + RMS , **M2**
-- [ ] Early Fusion of face + voice into one vector , **M3**
+- [x] Early Fusion of face + voice into one vector , **M3**
 - [x] At least 2 ML models for face (SVM, KNN) , **M1**
 - [x] At least 2 ML models for voice (SVM, Random Forest) , **M2**
 - [x] Face-only verification (Mode A) , **M1**
 - [x] Voice-only verification (Mode B) , **M2**
-- [ ] Multimodal verification with early fusion (Mode C) , **M3**
-- [ ] Hierarchical verification pipeline (Mode D) , **M3**
-- [ ] Metrics + confusion matrices for every system , **M3** (all use it)
-- [ ] Explanation of each metric and why it suits biometrics , **M3** (+ all review)
-- [ ] Comparison: individual vs. multimodal vs. hierarchical , **M3**
+- [x] Multimodal verification with early fusion (Mode C) , **M3**
+- [x] Hierarchical verification pipeline (Mode D) , **M3**
+- [x] Metrics + confusion matrices for every system , **M3** (all use it)
+- [x] Explanation of each metric and why it suits biometrics , **M3** (+ all review)
+- [x] Comparison: individual vs. multimodal vs. hierarchical , **M3**
 - [x] No Deep Learning anywhere in the code , **all**
 - [ ] Every member can explain the full system , **all**
 
@@ -202,32 +202,32 @@ Evaluation framework, early fusion, hierarchical pipeline, results comparison, r
 
 ### Checklist
 **Start first (others depend on it)**
-- [ ] Write `evaluate.py` early: confusion matrix, accuracy, precision, recall, F1, FAR, FRR, TAR, ROC/AUC, EER, plots
-- [ ] Set up the dataset folder structure, naming rules, and the **session-based split** (`GroupKFold`)
-- [ ] Hold out unseen impostor persons for the final open-set test
+- [x] Write `evaluate.py` early: confusion matrix, accuracy, precision, recall, F1, FAR, FRR, TAR, ROC/AUC, EER, plots
+- [x] Set up the dataset folder structure, naming rules, and the **session-based split** (`GroupKFold`)
+- [x] Hold out unseen impostor persons for the final open-set test
 
 **Early Fusion (Mode C)**
-- [ ] Scale face and voice vectors separately (fit on training data only)
-- [ ] Reduce face dimension (PCA) so blocks have comparable size
-- [ ] Concatenate into one vector, with optional block weights tuned on validation data
-- [ ] Train SVM and Random Forest on the fused vector
-- [ ] Implement `fuse(...)` and `fusion_score(...)`
-- [ ] Optional: late fusion (score averaging) as comparison (experiment E6)
+- [x] Scale face and voice vectors separately (fit on training data only)
+- [x] Reduce face dimension (PCA) so blocks have comparable size
+- [x] Concatenate into one vector, with optional block weights tuned on validation data
+- [x] Train SVM and Random Forest on the fused vector
+- [x] Implement `fuse(...)` and `fusion_score(...)`
+- [x] Optional: late fusion (score averaging) as comparison (experiment E6)
 
 **Hierarchical pipeline (Mode D)**
-- [ ] Level 1: face score, reject if `s_face < T_low`
-- [ ] Level 2: voice + fusion score, reject if `s_fusion < T_fusion`
-- [ ] Level 3: fingerprint match (with M1's function)
-- [ ] Choose thresholds on **validation data only**, then freeze them
-- [ ] Implement `hierarchical_verify(...)` returning the decision and level reached
-- [ ] Compare hierarchical vs. flat (always all modalities): FAR, FRR, EER, average processing time
+- [x] Level 1: face score, reject if `s_face < T_low`
+- [x] Level 2: voice + fusion score, reject if `s_fusion < T_fusion`
+- [x] Level 3: fingerprint match (with M1's function)
+- [x] Choose thresholds on **validation data only**, then freeze them
+- [x] Implement `hierarchical_verify(...)` returning the decision and level reached
+- [x] Compare hierarchical vs. flat (always all modalities): FAR, FRR, EER, average processing time
 
 **Evaluation and comparison**
 - [ ] Run all experiments E1-E8 with the team and collect results
-- [ ] Build the main comparison table (face-only, voice-only, fusion, hierarchical, with and without fingerprint)
-- [ ] Prepare confusion matrices and ROC curves for every system
-- [ ] Write the metrics explanation section (what each metric means and why it suits biometrics)
-- [ ] Robustness test: lighting changes and noisy audio (E7)
+- [x] Build the main comparison table (face-only, voice-only, fusion, hierarchical, with and without fingerprint)
+- [x] Prepare confusion matrices and ROC curves for every system
+- [x] Write the metrics explanation section (what each metric means and why it suits biometrics)
+- [x] Robustness test: lighting changes and noisy audio (E7)
 
 **Bonus 2: Real-time GUI**
 - [ ] GUI (OpenCV or Tkinter): live camera, claimed-identity selector, passphrase recording button, "Scan Fingerprint" button, status and result display

@@ -1,0 +1,81 @@
+system,model,metric,mean_over_users,std_over_users
+Face-only (Mode A),SVM,accuracy,0.9722222222222222,0.02777777777777779
+Face-only (Mode A),SVM,precision,1.0,0.0
+Face-only (Mode A),SVM,recall,0.8333333333333333,0.16666666666666669
+Face-only (Mode A),SVM,f1,0.9,0.09999999999999998
+Face-only (Mode A),SVM,FAR,0.0,0.0
+Face-only (Mode A),SVM,FRR,0.16666666666666666,0.16666666666666666
+Face-only (Mode A),SVM,EER,0.016666666666666666,0.016666666666666666
+Face-only (Mode A),SVM,AUC,0.9888888888888889,0.011111111111111072
+Face-only (Mode A),KNN,accuracy,0.9555555555555556,0.033333333333333326
+Face-only (Mode A),KNN,precision,0.8854166666666667,0.052083333333333315
+Face-only (Mode A),KNN,recall,0.8333333333333333,0.16666666666666669
+Face-only (Mode A),KNN,f1,0.8542413381123058,0.11350059737156515
+Face-only (Mode A),KNN,FAR,0.02,0.006666666666666667
+Face-only (Mode A),KNN,FRR,0.16666666666666666,0.16666666666666666
+Face-only (Mode A),KNN,EER,0.01,0.0033333333333333335
+Face-only (Mode A),KNN,AUC,0.9922222222222222,0.0011111111111110628
+Voice-only (Mode B),SVM,accuracy,0.95,0.016666666666666663
+Voice-only (Mode B),SVM,precision,1.0,0.0
+Voice-only (Mode B),SVM,recall,0.7,0.10000000000000003
+Voice-only (Mode B),SVM,f1,0.8194444444444444,0.06944444444444442
+Voice-only (Mode B),SVM,FAR,0.0,0.0
+Voice-only (Mode B),SVM,FRR,0.30000000000000004,0.1
+Voice-only (Mode B),SVM,EER,0.0,0.0
+Voice-only (Mode B),SVM,AUC,1.0,0.0
+Voice-only (Mode B),RF,accuracy,0.9,0.033333333333333326
+Voice-only (Mode B),RF,precision,1.0,0.0
+Voice-only (Mode B),RF,recall,0.4,0.19999999999999998
+Voice-only (Mode B),RF,f1,0.5416666666666666,0.20833333333333334
+Voice-only (Mode B),RF,FAR,0.0,0.0
+Voice-only (Mode B),RF,FRR,0.6000000000000001,0.2
+Voice-only (Mode B),RF,EER,0.0,0.0
+Voice-only (Mode B),RF,AUC,1.0,0.0
+Early Fusion (Mode C),SVM,accuracy,0.9722222222222223,0.016666666666666663
+Early Fusion (Mode C),SVM,precision,1.0,0.0
+Early Fusion (Mode C),SVM,recall,0.8333333333333333,0.10000000000000003
+Early Fusion (Mode C),SVM,f1,0.9058355437665783,0.05968169761273212
+Early Fusion (Mode C),SVM,FAR,0.0,0.0
+Early Fusion (Mode C),SVM,FRR,0.16666666666666666,0.1
+Early Fusion (Mode C),SVM,EER,0.0,0.0
+Early Fusion (Mode C),SVM,AUC,1.0,0.0
+Early Fusion (Mode C),RF,accuracy,0.95,0.016666666666666663
+Early Fusion (Mode C),RF,precision,1.0,0.0
+Early Fusion (Mode C),RF,recall,0.7,0.10000000000000003
+Early Fusion (Mode C),RF,f1,0.8194444444444444,0.06944444444444442
+Early Fusion (Mode C),RF,FAR,0.0,0.0
+Early Fusion (Mode C),RF,FRR,0.30000000000000004,0.1
+Early Fusion (Mode C),RF,EER,0.0,0.0
+Early Fusion (Mode C),RF,AUC,1.0,0.0
+Hierarchical (Mode D: face→fusion),Best pipeline,accuracy,0.9555555555555556,0.033333333333333326
+Hierarchical (Mode D: face→fusion),Best pipeline,precision,1.0,0.0
+Hierarchical (Mode D: face→fusion),Best pipeline,recall,0.7333333333333334,0.2
+Hierarchical (Mode D: face→fusion),Best pipeline,f1,0.830584707646177,0.13493253373313346
+Hierarchical (Mode D: face→fusion),Best pipeline,FAR,0.0,0.0
+Hierarchical (Mode D: face→fusion),Best pipeline,FRR,0.26666666666666666,0.2
+Hierarchical (Mode D: face→fusion),Best pipeline,EER,0.0,0.0
+Hierarchical (Mode D: face→fusion),Best pipeline,AUC,1.0,0.0
+Hierarchical + Fingerprint,Full system,accuracy,0.9555555555555556,0.033333333333333326
+Hierarchical + Fingerprint,Full system,precision,1.0,0.0
+Hierarchical + Fingerprint,Full system,recall,0.7333333333333334,0.2
+Hierarchical + Fingerprint,Full system,f1,0.830584707646177,0.13493253373313346
+Hierarchical + Fingerprint,Full system,FAR,0.0,0.0
+Hierarchical + Fingerprint,Full system,FRR,0.26666666666666666,0.2
+Hierarchical + Fingerprint,Full system,EER,0.0,0.0
+Hierarchical + Fingerprint,Full system,AUC,1.0,0.0
+Fingerprint-only (bonus),SVM,accuracy,0.9444444444444444,0.05555555555555558
+Fingerprint-only (bonus),SVM,precision,0.8,0.2
+Fingerprint-only (bonus),SVM,recall,1.0,0.0
+Fingerprint-only (bonus),SVM,f1,0.875,0.125
+Fingerprint-only (bonus),SVM,FAR,0.06666666666666667,0.06666666666666667
+Fingerprint-only (bonus),SVM,FRR,0.0,0.0
+Fingerprint-only (bonus),SVM,EER,0.0,0.0
+Fingerprint-only (bonus),SVM,AUC,1.0,7.850462293418876e-17
+Fingerprint-only (bonus),KNN,accuracy,0.8888888888888888,0.1111111111111111
+Fingerprint-only (bonus),KNN,precision,0.7142857142857143,0.28571428571428575
+Fingerprint-only (bonus),KNN,recall,1.0,0.0
+Fingerprint-only (bonus),KNN,f1,0.8,0.2
+Fingerprint-only (bonus),KNN,FAR,0.13333333333333333,0.13333333333333333
+Fingerprint-only (bonus),KNN,FRR,0.0,0.0
+Fingerprint-only (bonus),KNN,EER,0.006666666666666667,0.006666666666666667
+Fingerprint-only (bonus),KNN,AUC,0.9893333333333334,0.010666666666666658

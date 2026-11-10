@@ -1,0 +1,16 @@
+{
+  "user_id": "member1",
+  "t_low": 0.8278388214230495,
+  "t_fusion": 0.4583815281689438,
+  "t_fp": 0.2002532927875096,
+  "policy": "T_low:eer, others:eer",
+  "meta": {},
+  "models": {
+    "face_model": "face_knn",
+    "fusion_model": "fusion_svm",
+    "fp_model": "fp_svm",
+    "refit_all": false,
+    "dev_rows": 190,
+    "test_rows": 90
+  }
+}

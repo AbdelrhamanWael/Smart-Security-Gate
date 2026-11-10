@@ -32,21 +32,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 
-from command_system import (
+from src.command_system import (
     COMMAND_CLASSES,
     CommandClassifier,
     allowed_commands,
     execute_voice_command,
     set_active_command_classifier,
 )
-from evaluation import evaluate, plot_confusion_matrix, plot_roc_curve, plot_score_distributions
-from generate_synthetic_voice_data import generate_full_dataset
-from voice_dataset import (
+from src.evaluation import evaluate, plot_confusion_matrix, plot_roc_curve, plot_score_distributions
+from scripts.generate_synthetic_voice_data import generate_full_dataset
+from src.voice_dataset import (
     VoiceDataset,
     get_command_split,
     get_voice_verification_split,
 )
-from voice_verification import (
+from src.voice_verification import (
     DEFAULT_USERS,
     VoiceVerifier,
     get_active_verifier,

@@ -9,8 +9,8 @@ import os
 from pathlib import Path
 import time
 
-from audio_recorder import record_audio
-from command_system import (
+from src.audio_recorder import record_audio
+from src.command_system import (
     COMMAND_CLASSES,
     ROLE_PERMISSIONS,
     _AUDIT_LOGGER,
@@ -18,7 +18,7 @@ from command_system import (
     execute_voice_command,
     recognize_command,
 )
-from voice_verification import voice_score
+from src.voice_verification import voice_score
 
 
 def clear_screen():

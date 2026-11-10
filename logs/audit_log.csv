@@ -33,3 +33,7 @@ timestamp,user_id,role,level_reached,command,outcome,details
 2026-11-08T17:47:13.008964+00:00,member2,Operator,2,open,SUCCESS,SUCCESS: Gate / Vault UNLOCKED. Entry granted.
 2026-11-08T17:47:13.009449+00:00,member2,Operator,2,logs,PERMISSION_DENIED,"User 'member2' (Operator) does not have permission for 'logs'. Allowed: ['open', 'lock', 'status']"
 2026-11-08T17:47:13.009903+00:00,member3,Auditor,2,open,PERMISSION_DENIED,"User 'member3' (Auditor) does not have permission for 'open'. Allowed: ['logs', 'status']"
+2026-11-10T04:59:18.283512+00:00,member1,Super Admin,3,logs,SUCCESS,SUCCESS: Audit logs retrieved and displayed for security inspection.
+2026-11-10T04:59:18.312791+00:00,member1,Super Admin,0,logs,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-10T04:59:18.386245+00:00,member1,Super Admin,1,logs,ACCESS_DENIED,User is unverified or authentication failed. Protected actions blocked.
+2026-11-10T04:59:18.437496+00:00,member1,Super Admin,2,logs,SUCCESS,SUCCESS: Audit logs retrieved and displayed for security inspection.

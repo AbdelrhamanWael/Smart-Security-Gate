@@ -1,0 +1,1106 @@
+[
+  {
+    "user": "member1",
+    "info": {
+      "n_dev": 190,
+      "n_test": 90,
+      "dev_genuine": 30,
+      "test_genuine": 15
+    },
+    "unseen": [
+      "unseen_chim0",
+      "unseen_chim1",
+      "unseen_chim2"
+    ],
+    "seen": [
+      "seen_member2",
+      "seen_chim0",
+      "seen_chim1",
+      "seen_chim2"
+    ],
+    "selected": {
+      "face": "face_knn",
+      "voice": "voice_svm",
+      "fusion": "fusion_svm",
+      "fp": "fp_svm"
+    },
+    "fusion_params": {
+      "svm": {
+        "n_pca": 20,
+        "w_voice": 0.5,
+        "C": 1.0
+      },
+      "rf": {
+        "n_pca": 20,
+        "max_depth": null
+      }
+    },
+    "systems": {
+      "face_svm": {
+        "metrics": {
+          "threshold": 0.26303114961785373,
+          "tp": 15,
+          "fp": 0,
+          "tn": 75,
+          "fn": 0,
+          "accuracy": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "FAR": 0.0,
+          "FRR": 0.0,
+          "TAR": 1.0,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.30980782246042693
+        },
+        "dev_eer": 0.041666666666666664,
+        "dev_auc": 0.9979166666666667,
+        "thr": 0.26303114961785373
+      },
+      "face_knn": {
+        "metrics": {
+          "threshold": 0.8278388214230495,
+          "tp": 15,
+          "fp": 1,
+          "tn": 74,
+          "fn": 0,
+          "accuracy": 0.9888888888888889,
+          "precision": 0.9375,
+          "recall": 1.0,
+          "f1": 0.967741935483871,
+          "FAR": 0.013333333333333334,
+          "FRR": 0.0,
+          "TAR": 1.0,
+          "AUC": 0.9933333333333333,
+          "EER": 0.006666666666666667,
+          "eer_threshold": 1.0
+        },
+        "dev_eer": 0.03125,
+        "dev_auc": 0.9645833333333333,
+        "thr": 0.8278388214230495
+      },
+      "voice_svm": {
+        "metrics": {
+          "threshold": 0.4442114377808745,
+          "tp": 12,
+          "fp": 0,
+          "tn": 75,
+          "fn": 3,
+          "accuracy": 0.9666666666666667,
+          "precision": 1.0,
+          "recall": 0.8,
+          "f1": 0.8888888888888888,
+          "FAR": 0.0,
+          "FRR": 0.2,
+          "TAR": 0.8,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.36821160262896163
+        },
+        "dev_eer": 0.103125,
+        "dev_auc": 0.979375,
+        "thr": 0.4442114377808745
+      },
+      "voice_rf": {
+        "metrics": {
+          "threshold": 0.9,
+          "tp": 3,
+          "fp": 0,
+          "tn": 75,
+          "fn": 12,
+          "accuracy": 0.8666666666666667,
+          "precision": 1.0,
+          "recall": 0.2,
+          "f1": 0.3333333333333333,
+          "FAR": 0.0,
+          "FRR": 0.8,
+          "TAR": 0.19999999999999996,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.58
+        },
+        "dev_eer": 0.375,
+        "dev_auc": 0.875,
+        "thr": 0.9
+      },
+      "fusion_svm": {
+        "metrics": {
+          "threshold": 0.4583815281689438,
+          "tp": 14,
+          "fp": 0,
+          "tn": 75,
+          "fn": 1,
+          "accuracy": 0.9888888888888889,
+          "precision": 1.0,
+          "recall": 0.9333333333333333,
+          "f1": 0.9655172413793104,
+          "FAR": 0.0,
+          "FRR": 0.06666666666666667,
+          "TAR": 0.9333333333333333,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.36127549315916635
+        },
+        "dev_eer": 0.0,
+        "dev_auc": 1.0,
+        "thr": 0.4583815281689438
+      },
+      "fusion_rf": {
+        "metrics": {
+          "threshold": 0.5866666666666667,
+          "tp": 12,
+          "fp": 0,
+          "tn": 75,
+          "fn": 3,
+          "accuracy": 0.9666666666666667,
+          "precision": 1.0,
+          "recall": 0.8,
+          "f1": 0.8888888888888888,
+          "FAR": 0.0,
+          "FRR": 0.2,
+          "TAR": 0.8,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.5633333333333334
+        },
+        "dev_eer": 0.24166666666666664,
+        "dev_auc": 0.875,
+        "thr": 0.5866666666666667
+      },
+      "fp_svm": {
+        "metrics": {
+          "threshold": 0.2002532927875096,
+          "tp": 15,
+          "fp": 0,
+          "tn": 75,
+          "fn": 0,
+          "accuracy": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "FAR": 0.0,
+          "FRR": 0.0,
+          "TAR": 1.0,
+          "AUC": 0.9999999999999999,
+          "EER": 0.0,
+          "eer_threshold": 0.4740735360255564
+        },
+        "dev_eer": 0.0,
+        "dev_auc": 1.0,
+        "thr": 0.2002532927875096
+      },
+      "fp_knn": {
+        "metrics": {
+          "threshold": 1.0,
+          "tp": 15,
+          "fp": 0,
+          "tn": 75,
+          "fn": 0,
+          "accuracy": 1.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "FAR": 0.0,
+          "FRR": 0.0,
+          "TAR": 1.0,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 1.0
+        },
+        "dev_eer": 0.0,
+        "dev_auc": 1.0,
+        "thr": 1.0
+      }
+    },
+    "thresholds": {
+      "T_low": 0.8278388214230495,
+      "T_fusion": 0.4583815281689438,
+      "T_fp": 0.2002532927875096
+    },
+    "hier": {
+      "D": {
+        "threshold": 0.5,
+        "tp": 14,
+        "fp": 0,
+        "tn": 75,
+        "fn": 1,
+        "accuracy": 0.9888888888888889,
+        "precision": 1.0,
+        "recall": 0.9333333333333333,
+        "f1": 0.9655172413793104,
+        "FAR": 0.0,
+        "FRR": 0.06666666666666667,
+        "TAR": 0.9333333333333333,
+        "AUC": 1.0,
+        "EER": 0.0,
+        "eer_threshold": 0.40289396499022256
+      },
+      "DFP": {
+        "threshold": 0.5,
+        "tp": 14,
+        "fp": 0,
+        "tn": 75,
+        "fn": 1,
+        "accuracy": 0.9888888888888889,
+        "precision": 1.0,
+        "recall": 0.9333333333333333,
+        "f1": 0.9655172413793104,
+        "FAR": 0.0,
+        "FRR": 0.06666666666666667,
+        "TAR": 0.9333333333333333,
+        "AUC": 1.0,
+        "EER": 0.0,
+        "eer_threshold": 0.40289396499022256
+      },
+      "stats": {
+        "imp_stopped_L1": 0.9866666666666667,
+        "imp_stopped_L2": 0.013333333333333334,
+        "imp_stopped_L3": 0.0,
+        "imp_accepted_L3": 0.0,
+        "gen_rejected_L1": 0.0,
+        "gen_rejected_L2": 0.06666666666666667,
+        "gen_rejected_L3": 0.0,
+        "gen_reach_L3": 0.9333333333333333
+      }
+    },
+    "late": {
+      "metrics": {
+        "threshold": 0.702851669808465,
+        "tp": 12,
+        "fp": 0,
+        "tn": 75,
+        "fn": 3,
+        "accuracy": 0.9666666666666667,
+        "precision": 1.0,
+        "recall": 0.8,
+        "f1": 0.8888888888888888,
+        "FAR": 0.0,
+        "FRR": 0.2,
+        "TAR": 0.8,
+        "AUC": 1.0,
+        "EER": 0.0,
+        "eer_threshold": 0.6841058013144808
+      },
+      "thr": 0.702851669808465
+    },
+    "weights": [
+      {
+        "w_voice": 0.5,
+        "dev_cv_auc": 1.0,
+        "dev_cv_eer": 0.0,
+        "params": {
+          "n_pca": 20,
+          "w_voice": 0.5,
+          "C": 1.0
+        }
+      },
+      {
+        "w_voice": 1.0,
+        "dev_cv_auc": 1.0,
+        "dev_cv_eer": 0.0,
+        "params": {
+          "n_pca": 20,
+          "w_voice": 1.0,
+          "C": 1.0
+        }
+      },
+      {
+        "w_voice": 2.0,
+        "dev_cv_auc": 1.0,
+        "dev_cv_eer": 0.0,
+        "params": {
+          "n_pca": 20,
+          "w_voice": 2.0,
+          "C": 1.0
+        }
+      }
+    ],
+    "policy": [
+      {
+        "policy": "lenient",
+        "T_low": 0.8278388214230495,
+        "FAR": 0.0,
+        "FRR": 0.06666666666666667,
+        "accuracy": 0.9888888888888889,
+        "imp_stopped_L1": 0.9866666666666667,
+        "t_intruder_s": 0.06691917288686253
+      },
+      {
+        "policy": "eer",
+        "T_low": 0.8278388214230495,
+        "FAR": 0.0,
+        "FRR": 0.06666666666666667,
+        "accuracy": 0.9888888888888889,
+        "imp_stopped_L1": 0.9866666666666667,
+        "t_intruder_s": 0.06691917288686253
+      },
+      {
+        "policy": "far1",
+        "T_low": 1.000001,
+        "FAR": 0.0,
+        "FRR": 1.0,
+        "accuracy": 0.8333333333333334,
+        "imp_stopped_L1": 1.0,
+        "t_intruder_s": 0.026865741664854188
+      }
+    ],
+    "timing": {
+      "measured_ms": {
+        "face": 26.865741664854188,
+        "voice_fusion": 4.00734165062507,
+        "fingerprint": 14.551508327713236
+      },
+      "compute_only": {
+        "flat_face_voice": 0.030873083315479256,
+        "flat_face_voice_fp": 0.04542459164319249,
+        "hier_D": {
+          "intruder": 0.026919172886862526,
+          "genuine": 0.030873083315479267,
+          "mixed_50_50": 0.028896128101170898
+        },
+        "hier_DFP": {
+          "intruder": 0.026919172886862526,
+          "genuine": 0.044454491088011604,
+          "mixed_50_50": 0.035686831987437065
+        }
+      },
+      "with_capture": {
+        "flat_face_voice": 3.030873083315479,
+        "flat_face_voice_fp": 5.045424591643192,
+        "hier_D": {
+          "intruder": 0.06691917288686253,
+          "genuine": 3.0308730833154787,
+          "mixed_50_50": 1.5488961281011706
+        },
+        "hier_DFP": {
+          "intruder": 0.06691917288686253,
+          "genuine": 4.911121157754678,
+          "mixed_50_50": 2.4890201653207704
+        }
+      }
+    },
+    "robustness": [
+      {
+        "condition": "nominal",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.013333333333333334,
+          "FRR": 0.0,
+          "accuracy": 0.9888888888888889,
+          "AUC": 0.9933333333333333
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 0.2,
+          "accuracy": 0.9666666666666667,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 0.06666666666666667,
+          "accuracy": 0.9888888888888889,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 0.06666666666666667,
+          "accuracy": 0.9888888888888889,
+          "AUC": 1.0
+        }
+      },
+      {
+        "condition": "low light (x0.35)",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.0,
+          "FRR": 0.0,
+          "accuracy": 1.0,
+          "AUC": 1.0
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 0.2,
+          "accuracy": 0.9666666666666667,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 0.06666666666666667,
+          "accuracy": 0.9888888888888889,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 0.06666666666666667,
+          "accuracy": 0.9888888888888889,
+          "AUC": 0.9999999999999999
+        }
+      },
+      {
+        "condition": "over-exposed (x1.8)",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.013333333333333334,
+          "FRR": 0.0,
+          "accuracy": 0.9888888888888889,
+          "AUC": 0.9933333333333333
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 0.2,
+          "accuracy": 0.9666666666666667,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 0.06666666666666667,
+          "accuracy": 0.9888888888888889,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 0.06666666666666667,
+          "accuracy": 0.9888888888888889,
+          "AUC": 1.0
+        }
+      },
+      {
+        "condition": "noise 20 dB SNR",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.013333333333333334,
+          "FRR": 0.0,
+          "accuracy": 0.9888888888888889,
+          "AUC": 0.9933333333333333
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 0.2,
+          "accuracy": 0.9666666666666667,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 0.2,
+          "accuracy": 0.9666666666666667,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 0.2,
+          "accuracy": 0.9666666666666667,
+          "AUC": 1.0
+        }
+      },
+      {
+        "condition": "noise 10 dB SNR",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.013333333333333334,
+          "FRR": 0.0,
+          "accuracy": 0.9888888888888889,
+          "AUC": 0.9933333333333333
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        }
+      },
+      {
+        "condition": "low light + noise 10 dB",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.0,
+          "FRR": 0.0,
+          "accuracy": 1.0,
+          "AUC": 1.0
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 0.9999999999999999
+        }
+      }
+    ]
+  },
+  {
+    "user": "member2",
+    "info": {
+      "n_dev": 190,
+      "n_test": 90,
+      "dev_genuine": 30,
+      "test_genuine": 15
+    },
+    "unseen": [
+      "unseen_chim0",
+      "unseen_chim1",
+      "unseen_chim2"
+    ],
+    "seen": [
+      "seen_member1",
+      "seen_chim0",
+      "seen_chim1",
+      "seen_chim2"
+    ],
+    "selected": {
+      "face": "face_knn",
+      "voice": "voice_svm",
+      "fusion": "fusion_svm",
+      "fp": "fp_knn"
+    },
+    "fusion_params": {
+      "svm": {
+        "n_pca": 20,
+        "w_voice": 0.5,
+        "C": 1.0
+      },
+      "rf": {
+        "n_pca": 40,
+        "max_depth": null
+      }
+    },
+    "systems": {
+      "face_svm": {
+        "metrics": {
+          "threshold": 0.37768943170504377,
+          "tp": 10,
+          "fp": 0,
+          "tn": 75,
+          "fn": 5,
+          "accuracy": 0.9444444444444444,
+          "precision": 1.0,
+          "recall": 0.6666666666666666,
+          "f1": 0.8,
+          "FAR": 0.0,
+          "FRR": 0.3333333333333333,
+          "TAR": 0.6666666666666667,
+          "AUC": 0.9777777777777779,
+          "EER": 0.03333333333333333,
+          "eer_threshold": 0.25617223258353206
+        },
+        "dev_eer": 0.2645833333333334,
+        "dev_auc": 0.8377083333333334,
+        "thr": 0.37768943170504377
+      },
+      "face_knn": {
+        "metrics": {
+          "threshold": 0.7213672597506582,
+          "tp": 10,
+          "fp": 2,
+          "tn": 73,
+          "fn": 5,
+          "accuracy": 0.9222222222222223,
+          "precision": 0.8333333333333334,
+          "recall": 0.6666666666666666,
+          "f1": 0.7407407407407407,
+          "FAR": 0.02666666666666667,
+          "FRR": 0.3333333333333333,
+          "TAR": 0.6666666666666667,
+          "AUC": 0.9911111111111112,
+          "EER": 0.013333333333333334,
+          "eer_threshold": 0.6027261840968201
+        },
+        "dev_eer": 0.21041666666666664,
+        "dev_auc": 0.8883333333333332,
+        "thr": 0.7213672597506582
+      },
+      "voice_svm": {
+        "metrics": {
+          "threshold": 0.4410333731955209,
+          "tp": 9,
+          "fp": 0,
+          "tn": 75,
+          "fn": 6,
+          "accuracy": 0.9333333333333333,
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "FAR": 0.0,
+          "FRR": 0.4,
+          "TAR": 0.6,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.2827062538593067
+        },
+        "dev_eer": 0.0,
+        "dev_auc": 1.0,
+        "thr": 0.4410333731955209
+      },
+      "voice_rf": {
+        "metrics": {
+          "threshold": 0.8,
+          "tp": 9,
+          "fp": 0,
+          "tn": 75,
+          "fn": 6,
+          "accuracy": 0.9333333333333333,
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "FAR": 0.0,
+          "FRR": 0.4,
+          "TAR": 0.6,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.32
+        },
+        "dev_eer": 0.11249999999999999,
+        "dev_auc": 0.979375,
+        "thr": 0.8
+      },
+      "fusion_svm": {
+        "metrics": {
+          "threshold": 0.7835100983918759,
+          "tp": 11,
+          "fp": 0,
+          "tn": 75,
+          "fn": 4,
+          "accuracy": 0.9555555555555556,
+          "precision": 1.0,
+          "recall": 0.7333333333333333,
+          "f1": 0.8461538461538461,
+          "FAR": 0.0,
+          "FRR": 0.26666666666666666,
+          "TAR": 0.7333333333333334,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.7133930824648517
+        },
+        "dev_eer": 0.0,
+        "dev_auc": 1.0,
+        "thr": 0.7835100983918759
+      },
+      "fusion_rf": {
+        "metrics": {
+          "threshold": 0.7733333333333333,
+          "tp": 9,
+          "fp": 0,
+          "tn": 75,
+          "fn": 6,
+          "accuracy": 0.9333333333333333,
+          "precision": 1.0,
+          "recall": 0.6,
+          "f1": 0.75,
+          "FAR": 0.0,
+          "FRR": 0.4,
+          "TAR": 0.6,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.35
+        },
+        "dev_eer": 0.1395833333333333,
+        "dev_auc": 0.9772916666666668,
+        "thr": 0.7733333333333333
+      },
+      "fp_svm": {
+        "metrics": {
+          "threshold": 0.11661027805076424,
+          "tp": 15,
+          "fp": 10,
+          "tn": 65,
+          "fn": 0,
+          "accuracy": 0.8888888888888888,
+          "precision": 0.6,
+          "recall": 1.0,
+          "f1": 0.75,
+          "FAR": 0.13333333333333333,
+          "FRR": 0.0,
+          "TAR": 1.0,
+          "AUC": 1.0,
+          "EER": 0.0,
+          "eer_threshold": 0.9273223062452761
+        },
+        "dev_eer": 0.2677083333333333,
+        "dev_auc": 0.7487499999999999,
+        "thr": 0.11661027805076424
+      },
+      "fp_knn": {
+        "metrics": {
+          "threshold": 0.16610337193046254,
+          "tp": 15,
+          "fp": 20,
+          "tn": 55,
+          "fn": 0,
+          "accuracy": 0.7777777777777778,
+          "precision": 0.42857142857142855,
+          "recall": 1.0,
+          "f1": 0.6,
+          "FAR": 0.26666666666666666,
+          "FRR": 0.0,
+          "TAR": 1.0,
+          "AUC": 0.9786666666666667,
+          "EER": 0.013333333333333334,
+          "eer_threshold": 0.8476396698227208
+        },
+        "dev_eer": 0.26145833333333335,
+        "dev_auc": 0.7873958333333333,
+        "thr": 0.16610337193046254
+      }
+    },
+    "thresholds": {
+      "T_low": 0.7213672597506582,
+      "T_fusion": 0.7835100983918759,
+      "T_fp": 0.16610337193046254
+    },
+    "hier": {
+      "D": {
+        "threshold": 0.5,
+        "tp": 8,
+        "fp": 0,
+        "tn": 75,
+        "fn": 7,
+        "accuracy": 0.9222222222222223,
+        "precision": 1.0,
+        "recall": 0.5333333333333333,
+        "f1": 0.6956521739130435,
+        "FAR": 0.0,
+        "FRR": 0.4666666666666667,
+        "TAR": 0.5333333333333333,
+        "AUC": 1.0,
+        "EER": 0.0,
+        "eer_threshold": 0.3813589243461619
+      },
+      "DFP": {
+        "threshold": 0.5,
+        "tp": 8,
+        "fp": 0,
+        "tn": 75,
+        "fn": 7,
+        "accuracy": 0.9222222222222223,
+        "precision": 1.0,
+        "recall": 0.5333333333333333,
+        "f1": 0.6956521739130435,
+        "FAR": 0.0,
+        "FRR": 0.4666666666666667,
+        "TAR": 0.5333333333333333,
+        "AUC": 1.0,
+        "EER": 0.0,
+        "eer_threshold": 0.3813589243461619
+      },
+      "stats": {
+        "imp_stopped_L1": 0.9733333333333334,
+        "imp_stopped_L2": 0.02666666666666667,
+        "imp_stopped_L3": 0.0,
+        "imp_accepted_L3": 0.0,
+        "gen_rejected_L1": 0.3333333333333333,
+        "gen_rejected_L2": 0.13333333333333333,
+        "gen_rejected_L3": 0.0,
+        "gen_reach_L3": 0.5333333333333333
+      }
+    },
+    "late": {
+      "metrics": {
+        "threshold": 0.4725184032805088,
+        "tp": 14,
+        "fp": 0,
+        "tn": 75,
+        "fn": 1,
+        "accuracy": 0.9888888888888889,
+        "precision": 1.0,
+        "recall": 0.9333333333333333,
+        "f1": 0.9655172413793104,
+        "FAR": 0.0,
+        "FRR": 0.06666666666666667,
+        "TAR": 0.9333333333333333,
+        "AUC": 1.0,
+        "EER": 0.0,
+        "eer_threshold": 0.4427162189780634
+      },
+      "thr": 0.4725184032805088
+    },
+    "weights": [
+      {
+        "w_voice": 0.5,
+        "dev_cv_auc": 1.0,
+        "dev_cv_eer": 0.0,
+        "params": {
+          "n_pca": 20,
+          "w_voice": 0.5,
+          "C": 1.0
+        }
+      },
+      {
+        "w_voice": 1.0,
+        "dev_cv_auc": 1.0,
+        "dev_cv_eer": 0.0,
+        "params": {
+          "n_pca": 20,
+          "w_voice": 1.0,
+          "C": 1.0
+        }
+      },
+      {
+        "w_voice": 2.0,
+        "dev_cv_auc": 1.0,
+        "dev_cv_eer": 0.0,
+        "params": {
+          "n_pca": 20,
+          "w_voice": 2.0,
+          "C": 1.0
+        }
+      }
+    ],
+    "policy": [
+      {
+        "policy": "lenient",
+        "T_low": 0.0,
+        "FAR": 0.0,
+        "FRR": 0.26666666666666666,
+        "accuracy": 0.9555555555555556,
+        "imp_stopped_L1": 0.0,
+        "t_intruder_s": 3.0358681333309505
+      },
+      {
+        "policy": "eer",
+        "T_low": 0.7213672597506582,
+        "FAR": 0.0,
+        "FRR": 0.4666666666666667,
+        "accuracy": 0.9222222222222223,
+        "imp_stopped_L1": 0.9733333333333334,
+        "t_intruder_s": 0.11180464511064608
+      },
+      {
+        "policy": "far1",
+        "T_low": 1.000001,
+        "FAR": 0.0,
+        "FRR": 1.0,
+        "accuracy": 0.8333333333333334,
+        "imp_stopped_L1": 1.0,
+        "t_intruder_s": 0.03169331666625416
+      }
+    ],
+    "timing": {
+      "measured_ms": {
+        "face": 31.693316666254155,
+        "voice_fusion": 4.174816664696361,
+        "fingerprint": 15.533191675785929
+      },
+      "compute_only": {
+        "flat_face_voice": 0.035868133330950513,
+        "flat_face_voice_fp": 0.05140132500673644,
+        "hier_D": {
+          "intruder": 0.03180464511064606,
+          "genuine": 0.03447652777605172,
+          "mixed_50_50": 0.03314058644334889
+        },
+        "hier_DFP": {
+          "intruder": 0.03180464511064606,
+          "genuine": 0.04276089666980422,
+          "mixed_50_50": 0.037282770890225136
+        }
+      },
+      "with_capture": {
+        "flat_face_voice": 3.0358681333309505,
+        "flat_face_voice_fp": 5.051401325006736,
+        "hier_D": {
+          "intruder": 0.11180464511064608,
+          "genuine": 2.0344765277760515,
+          "mixed_50_50": 1.0731405864433488
+        },
+        "hier_DFP": {
+          "intruder": 0.11180464511064608,
+          "genuine": 3.1094275633364705,
+          "mixed_50_50": 1.6106161042235583
+        }
+      }
+    },
+    "robustness": [
+      {
+        "condition": "nominal",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.02666666666666667,
+          "FRR": 0.3333333333333333,
+          "accuracy": 0.9222222222222223,
+          "AUC": 0.9911111111111112
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 0.4,
+          "accuracy": 0.9333333333333333,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 0.26666666666666666,
+          "accuracy": 0.9555555555555556,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 0.4666666666666667,
+          "accuracy": 0.9222222222222223,
+          "AUC": 1.0
+        }
+      },
+      {
+        "condition": "low light (x0.35)",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.05333333333333334,
+          "FRR": 0.3333333333333333,
+          "accuracy": 0.9,
+          "AUC": 0.9511111111111111
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 0.4,
+          "accuracy": 0.9333333333333333,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 0.26666666666666666,
+          "accuracy": 0.9555555555555556,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 0.4666666666666667,
+          "accuracy": 0.9222222222222223,
+          "AUC": 1.0
+        }
+      },
+      {
+        "condition": "over-exposed (x1.8)",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.10666666666666667,
+          "FRR": 0.3333333333333333,
+          "accuracy": 0.8555555555555555,
+          "AUC": 0.9377777777777778
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 0.4,
+          "accuracy": 0.9333333333333333,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 0.2,
+          "accuracy": 0.9666666666666667,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 0.4666666666666667,
+          "accuracy": 0.9222222222222223,
+          "AUC": 1.0
+        }
+      },
+      {
+        "condition": "noise 20 dB SNR",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.02666666666666667,
+          "FRR": 0.3333333333333333,
+          "accuracy": 0.9222222222222223,
+          "AUC": 0.9911111111111112
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        }
+      },
+      {
+        "condition": "noise 10 dB SNR",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.02666666666666667,
+          "FRR": 0.3333333333333333,
+          "accuracy": 0.9222222222222223,
+          "AUC": 0.9911111111111112
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        }
+      },
+      {
+        "condition": "low light + noise 10 dB",
+        "face_not_detected": 0.0,
+        "face": {
+          "FAR": 0.05333333333333334,
+          "FRR": 0.3333333333333333,
+          "accuracy": 0.9,
+          "AUC": 0.9511111111111111
+        },
+        "voice": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "fusion": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        },
+        "hier": {
+          "FAR": 0.0,
+          "FRR": 1.0,
+          "accuracy": 0.8333333333333334,
+          "AUC": 1.0
+        }
+      }
+    ]
+  }
+]

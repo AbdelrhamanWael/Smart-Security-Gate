@@ -243,3 +243,74 @@ def plot_score_distributions(
 
     return fig, ax
 
+
+
+# ---------------------------------------------------------------------------
+# Threshold selection helpers (Member 3) - used to FREEZE thresholds on
+# validation data only, then apply them unchanged on the held-out test set.
+# ---------------------------------------------------------------------------
+
+def threshold_at_eer(y_true: np.ndarray, y_score: np.ndarray) -> float:
+    """Threshold where FAR ~= FRR (computed on the given validation scores)."""
+    return compute_eer(y_true, y_score)[1]
+
+
+def threshold_at_far(y_true: np.ndarray, y_score: np.ndarray, target_far: float = 0.01) -> float:
+    """
+    Lowest threshold whose FAR <= target_far (i.e. the most convenient
+    operating point that still satisfies the security requirement).
+    """
+    fpr, tpr, thr = roc_curve(np.asarray(y_true, dtype=int), np.asarray(y_score, dtype=float), pos_label=1)
+    ok = np.where(fpr <= target_far)[0]
+    idx = ok[-1] if len(ok) else 0  # highest TPR among points that satisfy FAR budget
+    t = float(thr[idx])
+    return t if np.isfinite(t) else float(np.max(y_score)) + 1e-6
+
+
+def threshold_at_frr(y_true: np.ndarray, y_score: np.ndarray, target_frr: float = 0.02) -> float:
+    """
+    Highest threshold whose FRR <= target_frr. Used for a lenient Level-1
+    gate: almost no genuine user is rejected early, the later levels do the
+    heavy lifting against impostors.
+    """
+    fpr, tpr, thr = roc_curve(np.asarray(y_true, dtype=int), np.asarray(y_score, dtype=float), pos_label=1)
+    fnr = 1.0 - tpr
+    ok = np.where(fnr <= target_frr)[0]
+    idx = ok[0] if len(ok) else len(thr) - 1  # lowest FAR among points that satisfy FRR budget
+    t = float(thr[idx])
+    return t if np.isfinite(t) else float(np.max(y_score)) + 1e-6
+
+
+def plot_roc_comparison(
+    curves: Dict[str, Tuple[np.ndarray, np.ndarray]],
+    title: str = "ROC Comparison",
+    save_path: Optional[Union[str, Path]] = None,
+) -> Tuple[plt.Figure, plt.Axes]:
+    """Overlay ROC curves of several systems: {name: (y_true, y_score)}."""
+    fig, ax = plt.subplots(figsize=(7.2, 6.0))
+    for name, (y, s) in curves.items():
+        y = np.asarray(y, dtype=int)
+        s = np.asarray(s, dtype=float)
+        if len(np.unique(y)) < 2:
+            continue
+        eer, _, fpr, fnr, _ = compute_eer(y, s)
+        auc_val = roc_auc_score(y, s)
+        ax.plot(fpr, 1.0 - fnr, lw=2, label=f"{name} (AUC={auc_val:.3f}, EER={eer:.1%})")
+    ax.plot([0, 1], [0, 1], color="gray", linestyle="--", lw=1, label="Chance")
+    ax.set_xlim([-0.02, 1.02])
+    ax.set_ylim([-0.02, 1.02])
+    ax.set_xlabel("False Acceptance Rate (FAR)", fontsize=11)
+    ax.set_ylabel("True Acceptance Rate (TAR = 1 - FRR)", fontsize=11)
+    ax.set_title(title, fontsize=12, fontweight="bold")
+    ax.grid(True, linestyle=":", alpha=0.6)
+    ax.legend(loc="lower right", fontsize=8.5)
+    plt.tight_layout()
+    if save_path:
+        Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(save_path, dpi=200)
+    return fig, ax
+
+
+def confusion_from_metrics(m: Dict[str, Union[float, int]]) -> np.ndarray:
+    """2x2 matrix [[TN, FP], [FN, TP]] from an evaluate() result."""
+    return np.array([[m["tn"], m["fp"]], [m["fn"], m["tp"]]], dtype=int)
