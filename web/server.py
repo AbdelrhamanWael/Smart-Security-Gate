@@ -65,6 +65,50 @@ GATE_STATE = {
     "last_access_time": None,
 }
 
+# Members and RBAC Configuration
+MEMBERS_CONFIG = {
+    "member1": {
+        "id": "member1",
+        "name": "Abdelrahman Wael (Super Admin)",
+        "full_name": "Abdelrahman Wael",
+        "role": "Super Admin",
+        "role_key": "super_admin",
+        "face_sample": "data/face/member1/session1/img_000.jpg",
+        "voice_sample": "data/voice/member1/session1/passphrase_01.wav",
+        "fp_sample": "data/fingerprint/member1/session1/img_001.jpg",
+    },
+    "member2": {
+        "id": "member2",
+        "name": "Hashem (Data Center Operator)",
+        "full_name": "Hashem",
+        "role": "Data Center Operator",
+        "role_key": "operator",
+        "face_sample": "data/face/member2/session1/img_000.jpg",
+        "voice_sample": "data/voice/member2/session1/passphrase_01.wav",
+        "fp_sample": "data/fingerprint/member2/session1/img_001.jpg",
+    },
+    "member3": {
+        "id": "member3",
+        "name": "Hagar (Security Auditor)",
+        "full_name": "Hagar",
+        "role": "Security Auditor",
+        "role_key": "auditor",
+        "face_sample": "",
+        "voice_sample": "data/voice/member3/session1/passphrase_01.wav",
+        "fp_sample": "data/fingerprint/member3/session1/img_001.jpg",
+    },
+    "impostor": {
+        "id": "impostor",
+        "name": "Unverified Intruder / Impostor",
+        "full_name": "Unverified Intruder",
+        "role": "Unverified Intruder",
+        "role_key": "intruder",
+        "face_sample": "data/face/impostors/Ariel_Sharon/session1/img_000.jpg",
+        "voice_sample": "data/voice/impostor1/session1/passphrase_01.wav",
+        "fp_sample": "data/fingerprint/impostors/finger_104/session1/img_001.jpg",
+    },
+}
+
 # In-Memory Server Inventory (Google Sheets style)
 SERVER_INVENTORY: List[Dict[str, Any]] = [
     {
@@ -228,22 +272,33 @@ def get_presets():
     """Returns available testing presets for rapid one-click demoing."""
     return {
         "member1": {
-            "name": "Member 1 (Super Admin)",
+            "name": "Abdelrahman Wael (Super Admin)",
             "role": "Super Admin",
+            "full_name": "Abdelrahman Wael",
             "face_sample": "data/face/member1/session1/img_000.jpg",
             "voice_sample": "data/voice/member1/session1/passphrase_01.wav",
             "fp_sample": "data/fingerprint/member1/session1/img_001.jpg",
         },
         "member2": {
-            "name": "Member 2 (Operator)",
-            "role": "Operator",
+            "name": "Hashem (Data Center Operator)",
+            "role": "Data Center Operator",
+            "full_name": "Hashem",
             "face_sample": "data/face/member2/session1/img_000.jpg",
             "voice_sample": "data/voice/member2/session1/passphrase_01.wav",
             "fp_sample": "data/fingerprint/member2/session1/img_001.jpg",
         },
+        "member3": {
+            "name": "Hagar (Security Auditor)",
+            "role": "Security Auditor",
+            "full_name": "Hagar",
+            "face_sample": "",
+            "voice_sample": "data/voice/member3/session1/passphrase_01.wav",
+            "fp_sample": "data/fingerprint/member3/session1/img_001.jpg",
+        },
         "impostor": {
-            "name": "Intruder / Impostor",
+            "name": "Unverified Intruder / Impostor",
             "role": "Unverified Intruder",
+            "full_name": "Unverified Intruder",
             "face_sample": "data/face/impostors/Ariel_Sharon/session1/img_000.jpg",
             "voice_sample": "data/voice/impostor1/session1/passphrase_01.wav",
             "fp_sample": "data/fingerprint/impostors/finger_104/session1/img_001.jpg",
@@ -254,36 +309,34 @@ def get_presets():
 @app.get("/api/dataset/files")
 def get_dataset_files():
     """Returns curated lists of files from data/ directory for dropdown selection."""
-    import glob
-
-    def scan_curated(pattern, max_items=10):
-        found = sorted(glob.glob(pattern, recursive=True))
-        return [f.replace("\\", "/") for f in found[:max_items]]
-
     return {
         "faces": [
-            {"label": "Member 1 - Genuine (Session 1)", "path": "data/face/member1/session1/img_000.jpg", "category": "genuine_m1"},
-            {"label": "Member 1 - Genuine (Session 2)", "path": "data/face/member1/session2/img_000.jpg", "category": "genuine_m1"},
-            {"label": "Member 2 - Genuine (Session 1)", "path": "data/face/member2/session1/img_000.jpg", "category": "genuine_m2"},
-            {"label": "Member 2 - Genuine (Session 2)", "path": "data/face/member2/session2/img_000.jpg", "category": "genuine_m2"},
+            {"label": "Abdelrahman Wael - Genuine (Session 1)", "path": "data/face/member1/session1/img_000.jpg", "category": "genuine_m1"},
+            {"label": "Abdelrahman Wael - Genuine (Session 2)", "path": "data/face/member1/session2/img_000.jpg", "category": "genuine_m1"},
+            {"label": "Hashem - Genuine (Session 1)", "path": "data/face/member2/session1/img_000.jpg", "category": "genuine_m2"},
+            {"label": "Hashem - Genuine (Session 2)", "path": "data/face/member2/session2/img_000.jpg", "category": "genuine_m2"},
             {"label": "Impostor Face 1 (Ariel Sharon)", "path": "data/face/impostors/Ariel_Sharon/session1/img_000.jpg", "category": "impostor"},
             {"label": "Impostor Face 2 (Colin Powell)", "path": "data/face/impostors/Colin_Powell/session1/img_000.jpg", "category": "impostor"},
         ],
         "voices": [
-            {"label": "Member 1 - Genuine (Passphrase 01)", "path": "data/voice/member1/session1/passphrase_01.wav", "category": "genuine_m1"},
-            {"label": "Member 1 - Genuine (Passphrase 02)", "path": "data/voice/member1/session2/passphrase_01.wav", "category": "genuine_m1"},
-            {"label": "Member 2 - Genuine (Passphrase 01)", "path": "data/voice/member2/session1/passphrase_01.wav", "category": "genuine_m2"},
-            {"label": "Member 2 - Genuine (Passphrase 02)", "path": "data/voice/member2/session2/passphrase_01.wav", "category": "genuine_m2"},
+            {"label": "Abdelrahman Wael - Passphrase 01", "path": "data/voice/member1/session1/passphrase_01.wav", "category": "genuine_m1"},
+            {"label": "Abdelrahman Wael - Passphrase 02", "path": "data/voice/member1/session2/passphrase_01.wav", "category": "genuine_m1"},
+            {"label": "Hashem - Passphrase 01", "path": "data/voice/member2/session1/passphrase_01.wav", "category": "genuine_m2"},
+            {"label": "Hashem - Passphrase 02", "path": "data/voice/member2/session2/passphrase_01.wav", "category": "genuine_m2"},
+            {"label": "Hagar - Passphrase 01", "path": "data/voice/member3/session1/passphrase_01.wav", "category": "genuine_m3"},
+            {"label": "Hagar - Passphrase 02", "path": "data/voice/member3/session2/passphrase_01.wav", "category": "genuine_m3"},
             {"label": "Impostor Voice 1 (Unseen Attacker)", "path": "data/voice/impostor1/session1/passphrase_01.wav", "category": "impostor"},
             {"label": "Impostor Voice 2 (Unseen Attacker)", "path": "data/voice/impostor2/session1/passphrase_01.wav", "category": "impostor"},
         ],
         "fingerprints": [
-            {"label": "Member 1 - Genuine Ridge (Session 1)", "path": "data/fingerprint/member1/session1/img_001.jpg", "category": "genuine_m1"},
-            {"label": "Member 1 - Genuine Ridge (Session 2)", "path": "data/fingerprint/member1/session2/img_001.jpg", "category": "genuine_m1"},
-            {"label": "Member 2 - Genuine Ridge (Session 1)", "path": "data/fingerprint/member2/session1/img_001.jpg", "category": "genuine_m2"},
-            {"label": "Member 2 - Genuine Ridge (Session 2)", "path": "data/fingerprint/member2/session2/img_001.jpg", "category": "genuine_m2"},
-            {"label": "Impostor Fingerprint 1", "path": "data/fingerprint/impostors/finger_104/session1/img_001.jpg", "category": "impostor"},
-            {"label": "Impostor Fingerprint 2", "path": "data/fingerprint/impostors/finger_105/session1/img_001.jpg", "category": "impostor"},
+            {"label": "Abdelrahman Wael - Fingerprint Ridge (Session 1)", "path": "data/fingerprint/member1/session1/img_001.jpg", "category": "genuine_m1"},
+            {"label": "Abdelrahman Wael - Fingerprint Ridge (Session 2)", "path": "data/fingerprint/member1/session2/img_001.jpg", "category": "genuine_m1"},
+            {"label": "Hashem - Fingerprint Ridge (Session 1)", "path": "data/fingerprint/member2/session1/img_001.jpg", "category": "genuine_m2"},
+            {"label": "Hashem - Fingerprint Ridge (Session 2)", "path": "data/fingerprint/member2/session2/img_001.jpg", "category": "genuine_m2"},
+            {"label": "Hagar - Fingerprint Ridge (Session 1)", "path": "data/fingerprint/member3/session1/img_001.jpg", "category": "genuine_m3"},
+            {"label": "Hagar - Fingerprint Ridge (Session 2)", "path": "data/fingerprint/member3/session2/img_001.jpg", "category": "genuine_m3"},
+            {"label": "Impostor Fingerprint 1 (Intruder 104)", "path": "data/fingerprint/impostors/finger_104/session1/img_001.jpg", "category": "impostor"},
+            {"label": "Impostor Fingerprint 2 (Intruder 105)", "path": "data/fingerprint/impostors/finger_105/session1/img_001.jpg", "category": "impostor"},
         ],
     }
 
@@ -307,6 +360,20 @@ async def api_verify_face(request: Request):
 
     if img is None:
         raise HTTPException(status_code=400, detail="Failed to decode face image")
+
+    if user_id == "member3":
+        # Member 3 (Hagar) is registered with Voice + Fingerprint biometrics
+        return {
+            "modality": "face",
+            "user_id": user_id,
+            "user_name": "Hagar",
+            "score": 0.0,
+            "score_percent": 0.0,
+            "threshold": 0.50,
+            "verified": False,
+            "note": "Member 3 (Hagar) relies on Voice & Fingerprint verification (2-of-3 policy).",
+            "time_ms": round((time.perf_counter() - t0) * 1000.0, 2),
+        }
 
     score = face_score(img, user_id=user_id, model_type="svm")
     threshold = 0.50
@@ -399,9 +466,11 @@ async def api_verify_fingerprint(request: Request):
 @app.post("/api/verify/cascade")
 async def api_verify_cascade(request: Request):
     """
-    Executes the full 3-level Hierarchical Cascade Pipeline (Mode D):
-      Level 1: Face -> Level 2: Voice+Fusion -> Level 3: Fingerprint.
-    Returns complete breakdown, timing per stage, decisions, and session token.
+    Executes the 2-out-of-3 Biometric Verification Policy:
+      Modality 1: Face Verification (Mode A, Threshold: 0.50)
+      Modality 2: Voice Verification (Mode B, Threshold: 0.50)
+      Modality 3: Fingerprint Biometrics (Bonus 4, Threshold: 0.20)
+    Access is GRANTED if at least 2 out of the 3 modalities pass (2/3 majority).
     """
     t_start = time.perf_counter()
     form = await request.form()
@@ -415,6 +484,10 @@ async def api_verify_cascade(request: Request):
     voice_audio = form.get("voice_audio")
     fp_image = form.get("fp_image")
 
+    timing_dict: Dict[str, float] = {}
+    scores: Dict[str, Optional[float]] = {"face": None, "voice": None, "fingerprint": None}
+    passed_modalities: Dict[str, bool] = {"face": False, "voice": False, "fingerprint": False}
+
     # 1. Resolve Face
     face_target = None
     if face_image and hasattr(face_image, "read"):
@@ -424,8 +497,23 @@ async def api_verify_cascade(request: Request):
     if face_target is None and face_preset and (ROOT_DIR / str(face_preset)).exists():
         face_target = cv2.imread(str(ROOT_DIR / str(face_preset)), cv2.IMREAD_COLOR)
 
-    if face_target is None:
-        raise HTTPException(status_code=400, detail="Face input missing or unreadable")
+    t0_face = time.perf_counter()
+    if face_target is not None:
+        try:
+            if user_id in ("member1", "member2"):
+                f_score = face_score(face_target, user_id=user_id, model_type="svm")
+            else:
+                f_score = 0.0
+            scores["face"] = round(f_score, 4)
+            passed_modalities["face"] = bool(f_score >= 0.50)
+        except Exception as e:
+            scores["face"] = 0.0
+            passed_modalities["face"] = False
+        timing_dict["level1_face"] = round((time.perf_counter() - t0_face) * 1000.0, 2)
+    else:
+        scores["face"] = None
+        passed_modalities["face"] = False
+        timing_dict["level1_face"] = None
 
     # 2. Resolve Voice
     voice_target = None
@@ -436,6 +524,21 @@ async def api_verify_cascade(request: Request):
     if voice_target is None and voice_preset and (ROOT_DIR / str(voice_preset)).exists():
         voice_target = str(ROOT_DIR / str(voice_preset))
 
+    t0_voice = time.perf_counter()
+    if voice_target is not None:
+        try:
+            v_score = voice_score(voice_target, user_id=user_id)
+            scores["voice"] = round(v_score, 4)
+            passed_modalities["voice"] = bool(v_score >= 0.50)
+        except Exception as e:
+            scores["voice"] = 0.0
+            passed_modalities["voice"] = False
+        timing_dict["level2_voice_fusion"] = round((time.perf_counter() - t0_voice) * 1000.0, 2)
+    else:
+        scores["voice"] = None
+        passed_modalities["voice"] = False
+        timing_dict["level2_voice_fusion"] = None
+
     # 3. Resolve Fingerprint
     fp_target = None
     if fp_image and hasattr(fp_image, "read"):
@@ -445,34 +548,43 @@ async def api_verify_cascade(request: Request):
     if fp_target is None and fp_preset and (ROOT_DIR / str(fp_preset)).exists():
         fp_target = str(ROOT_DIR / str(fp_preset))
 
-    # Run Hierarchical Cascade
-    result = hierarchical_verify(
-        user_id=user_id,
-        face_img=face_target,
-        audio=voice_target,
-        fingerprint_img=fp_target,
-        require_fingerprint=False,
-    )
+    t0_fp = time.perf_counter()
+    if fp_target is not None:
+        try:
+            fp_sc = fingerprint_score(fp_target, user_id=user_id, model_type="svm")
+            scores["fingerprint"] = round(fp_sc, 4)
+            passed_modalities["fingerprint"] = bool(fp_sc >= 0.20)
+        except Exception as e:
+            scores["fingerprint"] = 0.0
+            passed_modalities["fingerprint"] = False
+        timing_dict["level3_fingerprint"] = round((time.perf_counter() - t0_fp) * 1000.0, 2)
+    else:
+        scores["fingerprint"] = None
+        passed_modalities["fingerprint"] = False
+        timing_dict["level3_fingerprint"] = None
+
+    # Evaluation: At least 2 out of 3 modalities must pass
+    passed_count = sum(1 for passed in passed_modalities.values() if passed)
+    is_verified = bool(passed_count >= 2)
+    level_reached = passed_count
 
     total_time_ms = (time.perf_counter() - t_start) * 1000.0
 
-    # Determine role & permissions based on verification
-    is_verified = result["decision"]
-    level_reached = result["level_reached"]
-
+    # Role Assignment & Mapping
+    member_cfg = MEMBERS_CONFIG.get(user_id, MEMBERS_CONFIG["impostor"])
     if is_verified:
-        if user_id == "member1":
-            role = "Super Admin"
-            role_key = "super_admin"
-        elif user_id == "member2":
-            role = "Data Center Operator"
-            role_key = "operator"
-        else:
-            role = "Auditor"
-            role_key = "auditor"
+        role = member_cfg["role"]
+        role_key = member_cfg["role_key"]
+        full_name = member_cfg["full_name"]
+        stopped_at = "completed"
+        decision_str = f"ACCESS GRANTED (Verified {passed_count}/3 Modalities)"
     else:
         role = "Unverified Intruder"
         role_key = "intruder"
+        full_name = "Unverified Intruder"
+        failed_list = [k for k, v in passed_modalities.items() if not v]
+        stopped_at = f"failed ({', '.join(failed_list)})"
+        decision_str = f"ACCESS DENIED (Only {passed_count}/3 Verified, Minimum 2 Required)"
 
     # Create session token if verified
     session_token = None
@@ -480,38 +592,41 @@ async def api_verify_cascade(request: Request):
         session_token = f"gate_tok_{uuid.uuid4().hex[:16]}"
         SESSION_TOKENS[session_token] = {
             "user_id": user_id,
+            "full_name": full_name,
             "role": role,
             "role_key": role_key,
-            "level_reached": level_reached,
+            "passed_count": passed_count,
             "created_at": time.time(),
         }
         GATE_STATE["perimeter_gate"] = "UNLOCKED"
-        GATE_STATE["last_access_by"] = f"{user_id} ({role})"
+        GATE_STATE["last_access_by"] = f"{full_name} ({role})"
         GATE_STATE["last_access_time"] = time.strftime("%H:%M:%S")
 
     # Log to audit trail
     log_audit_event(
-        claimed_user=user_id,
+        claimed_user=f"{full_name} ({user_id})",
         verified=is_verified,
-        level_reached=level_reached,
-        scores=result["scores"],
+        level_reached=passed_count,
+        scores=scores,
         decision="ACCESS GRANTED" if is_verified else "ACCESS DENIED",
         role=role,
         time_ms=total_time_ms,
     )
 
-    timing_dict = result.get("timing_ms") or result.get("time_per_stage") or {}
-
     return {
         "decision": is_verified,
-        "decision_str": "ACCESS GRANTED" if is_verified else "ACCESS DENIED",
-        "level_reached": level_reached,
-        "stopped_at": result["stopped_at"],
-        "scores": result["scores"],
-        "thresholds": result["thresholds"],
+        "decision_str": decision_str,
+        "passed_count": passed_count,
+        "total_modalities": 3,
+        "level_reached": passed_count,
+        "stopped_at": stopped_at,
+        "passed_modalities": passed_modalities,
+        "scores": scores,
+        "thresholds": {"T_low": 0.50, "T_fusion": 0.50, "T_fp": 0.20},
         "time_per_stage": timing_dict,
         "total_time_ms": round(total_time_ms, 2),
         "user_id": user_id,
+        "user_name": full_name,
         "role": role,
         "role_key": role_key,
         "session_token": session_token,
@@ -521,7 +636,7 @@ async def api_verify_cascade(request: Request):
 @app.get("/api/dashboard/data")
 def get_dashboard_data(token: Optional[str] = None):
     """Returns dashboard data, telemetry, server inventory sheet, and audit log."""
-    session = SESSION_TOKENS.get(token)
+    session = SESSION_TOKENS.get(token) if token else None
     if not session:
         # Default guest/unauthenticated preview or fallback
         user_info = {
@@ -532,18 +647,27 @@ def get_dashboard_data(token: Optional[str] = None):
             "can_edit_sheet": False,
             "can_access_vault": False,
         }
+        gate_state_view = {
+            "perimeter_gate": "LOCKED",
+            "vault_door": "LOCKED",
+            "emergency_mode": False,
+            "last_access_by": None,
+            "last_access_time": None,
+        }
     else:
         can_edit = session["role_key"] == "super_admin"
         can_vault = session["role_key"] == "super_admin"
         user_info = {
             "authenticated": True,
             "user_id": session["user_id"],
+            "full_name": session.get("full_name", session["user_id"]),
             "role": session["role"],
             "role_key": session["role_key"],
-            "level_reached": session["level_reached"],
+            "level_reached": session.get("passed_count", session.get("level_reached", 2)),
             "can_edit_sheet": can_edit,
             "can_access_vault": can_vault,
         }
+        gate_state_view = GATE_STATE
 
     # Read recent 10 audit logs
     audit_rows = []
@@ -558,7 +682,7 @@ def get_dashboard_data(token: Optional[str] = None):
 
     return {
         "user": user_info,
-        "gate_state": GATE_STATE,
+        "gate_state": gate_state_view,
         "telemetry": {
             "temperature_c": 21.8,
             "humidity_pct": 42.5,
@@ -570,6 +694,18 @@ def get_dashboard_data(token: Optional[str] = None):
         "inventory_sheet": SERVER_INVENTORY,
         "recent_audit_logs": audit_rows,
     }
+
+
+@app.post("/api/logout")
+def api_logout():
+    """Resets all active sessions and locks gate."""
+    SESSION_TOKENS.clear()
+    GATE_STATE["perimeter_gate"] = "LOCKED"
+    GATE_STATE["vault_door"] = "LOCKED"
+    GATE_STATE["emergency_mode"] = False
+    GATE_STATE["last_access_by"] = None
+    GATE_STATE["last_access_time"] = None
+    return {"status": "ok", "message": "Gate locked and user logged out."}
 
 
 @app.post("/api/dashboard/sheet/update")

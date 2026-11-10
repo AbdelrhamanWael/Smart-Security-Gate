@@ -27,6 +27,9 @@
       <div id="activeUserBadge" style="font-size: 13px; font-family: var(--font-mono); color: var(--text-muted);">
         User: <span id="headerUserText" style="color: var(--accent-cyan); font-weight: 700;">Unauthenticated</span>
       </div>
+      <button id="btnLogoutHeader" class="btn-secondary" style="padding: 6px 14px; font-size: 12px; border-color: rgba(255, 77, 106, 0.4); color: #ff6b8b;" onclick="logoutAndResetGate()">
+        <span>🚪</span> Logout & Lock Gate
+      </button>
     </div>
   </header>
 
@@ -61,27 +64,34 @@
         <div class="user-select-bar">
           <label>Claimed Identity:</label>
           <div class="user-pill-group">
-            <button class="user-pill active" onclick="selectClaimedUser('member1', this)">Member 1 (Super Admin)</button>
-            <button class="user-pill" onclick="selectClaimedUser('member2', this)">Member 2 (Operator)</button>
-            <button class="user-pill" onclick="selectClaimedUser('impostor', this)">Intruder / Impostor</button>
+            <button class="user-pill active" onclick="selectClaimedUser('member1', this)">🛡️ Abdelrahman Wael (Super Admin)</button>
+            <button class="user-pill" onclick="selectClaimedUser('member2', this)">⚙️ Hashem (Operator)</button>
+            <button class="user-pill" onclick="selectClaimedUser('member3', this)">🔍 Hagar (Auditor)</button>
+            <button class="user-pill" onclick="selectClaimedUser('impostor', this)">🚨 Intruder / Impostor</button>
           </div>
+        </div>
+
+        <!-- Verification Policy Notice -->
+        <div style="background: rgba(0, 229, 255, 0.08); border: 1px solid rgba(0, 229, 255, 0.25); border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: var(--accent-cyan); display: flex; align-items: center; gap: 8px;">
+          <span>⚖️</span>
+          <span><strong>Gate Biometric Policy:</strong> Access is GRANTED if at least 2 out of 3 modalities pass (2-of-3 Rule).</span>
         </div>
 
         <!-- Quick 1-Click Preset Demos -->
         <div class="presets-box">
-          <div class="presets-title">⚡ Instant Presentation Presets (1-Click Test)</div>
+          <div class="presets-title">⚡ Automated 1-Click Simulation (Preloads Genuine Files & Verifies Immediately)</div>
           <div class="presets-btns">
             <button class="preset-btn" onclick="runPresetDemo('member1_genuine')">
-              <span>✅</span> Member 1 Genuine (All Pass)
+              <span>▶️ Simulate:</span> Abdelrahman Wael (Pass)
             </button>
             <button class="preset-btn" onclick="runPresetDemo('member2_genuine')">
-              <span>✅</span> Member 2 Genuine (Operator Pass)
+              <span>▶️ Simulate:</span> Hashem (Pass)
+            </button>
+            <button class="preset-btn" onclick="runPresetDemo('member3_genuine')">
+              <span>▶️ Simulate:</span> Hagar (Pass: Voice+FP)
             </button>
             <button class="preset-btn attack" onclick="runPresetDemo('impostor_attack')">
-              <span>🚨</span> Unseen Impostor Attack (Denied L1)
-            </button>
-            <button class="preset-btn attack" onclick="runPresetDemo('spoof_voice')">
-              <span>⚠️</span> Right Face, Wrong Voice (Denied L2)
+              <span>🚨 Simulate:</span> Impostor Attack (Denied)
             </button>
           </div>
         </div>
@@ -98,13 +108,13 @@
           <!-- Modality Input Tabs -->
           <div class="modality-tab-bar">
             <button id="faceTabLive" class="modality-tab-btn active" onclick="setFaceInputMode('live')">
-              <span>📹</span> كاميرا حية (Webcam)
+              <span>📹</span> Live Webcam
             </button>
             <button id="faceTabUpload" class="modality-tab-btn" onclick="setFaceInputMode('upload')">
-              <span>📂</span> رفع صورة من جهازك
+              <span>📂</span> Upload Face Image
             </button>
             <button id="faceTabDataset" class="modality-tab-btn" onclick="setFaceInputMode('dataset')">
-              <span>📋</span> اختيار من الداتا
+              <span>📋</span> Choose from Dataset
             </button>
           </div>
 
@@ -116,8 +126,8 @@
             
             <div id="camPlaceholder" class="camera-placeholder">
               <div class="cam-icon">📷</div>
-              <div style="font-size: 13px; font-weight: 600;">الكاميرا متوقفة حالياً</div>
-              <div style="font-size: 11px;">اضغط على "تشغيل الكاميرا" للبدء أو اختر صورة</div>
+              <div style="font-size: 13px; font-weight: 600;">Webcam Inactive</div>
+              <div style="font-size: 11px;">Click "Start Camera" or select a file from dataset</div>
             </div>
 
             <div class="radar-scan-overlay"></div>
@@ -128,16 +138,16 @@
           <div id="faceUploadSection" class="file-upload-container" style="display: none;">
             <input type="file" id="faceFileInput" accept="image/*" style="display: none;" onchange="handleFaceFileUpload(event)">
             <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="document.getElementById('faceFileInput').click()">
-              <span>📂</span> اختر ملف صورة (JPG / PNG) من جهازك
+              <span>📂</span> Choose Face Image File (JPG / PNG)
             </button>
             <div id="facePickedName" class="file-picked-label" style="display: none;"></div>
           </div>
 
           <!-- Sub-panel for Dataset Selection Dropdown -->
           <div id="faceDatasetSection" class="file-upload-container" style="display: none;">
-            <label style="font-size: 11px; color: var(--text-muted);">اختر عينة مباشرة من مجلد data/face/:</label>
+            <label style="font-size: 11px; color: var(--text-muted);">Select sample from data/face/:</label>
             <select id="faceSelectDropdown" class="select-dropdown" onchange="handleFaceDropdownSelect(this)">
-              <option value="">-- اختر ملف من الداتا --</option>
+              <option value="">-- Select Face Sample from Dataset --</option>
             </select>
           </div>
 
@@ -145,14 +155,14 @@
           <div class="stage-actions" style="margin-top: 14px; justify-content: space-between;">
             <div style="display: flex; gap: 8px;">
               <button id="btnStartCamera" class="btn-primary" onclick="toggleCamera()">
-                <span>📹</span> تشغيل الكاميرا
+                <span>📹</span> Start Camera
               </button>
               <button id="btnCaptureFace" class="btn-secondary" style="display: none;" onclick="captureFaceSnapshot()">
-                <span>📸</span> التقاط لقطة
+                <span>📸</span> Capture Snapshot
               </button>
             </div>
             <button class="btn-test-single" onclick="verifySingleModality('face')">
-              <span>🔍</span> فحص الوجه فقط
+              <span>🔍</span> Test Face Only
             </button>
           </div>
         </div>
@@ -161,7 +171,7 @@
         <div id="stageVoiceCard" class="stage-card">
           <div class="stage-header">
             <span style="font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-              <span>🎙️</span> Level 2: Voice Verification & Early Fusion (Mode C)
+              <span>🎙️</span> Level 2: Voice Verification (Mode B)
             </span>
             <span id="badgeVoice" class="stage-badge">STANDBY</span>
           </div>
@@ -169,20 +179,20 @@
           <!-- Modality Input Tabs -->
           <div class="modality-tab-bar">
             <button id="voiceTabLive" class="modality-tab-btn active" onclick="setVoiceInputMode('live')">
-              <span>🎤</span> مايكروفون حي (Live Mic)
+              <span>🎤</span> Live Mic
             </button>
             <button id="voiceTabUpload" class="modality-tab-btn" onclick="setVoiceInputMode('upload')">
-              <span>📂</span> رفع ملف صوت (WAV)
+              <span>📂</span> Upload Audio (WAV)
             </button>
             <button id="voiceTabDataset" class="modality-tab-btn" onclick="setVoiceInputMode('dataset')">
-              <span>📋</span> اختيار من الداتا
+              <span>📋</span> Choose from Dataset
             </button>
           </div>
 
           <div class="audio-visual-box">
             <canvas id="voiceWaveCanvas" class="mic-wave-canvas"></canvas>
             <div id="voiceStatusText" style="position: absolute; font-size: 12px; font-family: var(--font-mono); color: var(--accent-cyan); text-align: center; padding: 0 10px;">
-              جاهز: انطق عبارة "Open security gate now"
+              Ready: Speak passphrase "Open security gate now"
             </div>
           </div>
 
@@ -190,26 +200,26 @@
           <div id="voiceUploadSection" class="file-upload-container" style="display: none;">
             <input type="file" id="voiceFileInput" accept="audio/*" style="display: none;" onchange="handleVoiceFileUpload(event)">
             <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="document.getElementById('voiceFileInput').click()">
-              <span>📂</span> اختر ملف صوتي (WAV / OGG) من جهازك
+              <span>📂</span> Choose Audio File (WAV / OGG)
             </button>
             <div id="voicePickedName" class="file-picked-label" style="display: none;"></div>
           </div>
 
           <!-- Sub-panel for Dataset Selection Dropdown -->
           <div id="voiceDatasetSection" class="file-upload-container" style="display: none;">
-            <label style="font-size: 11px; color: var(--text-muted);">اختر عينة مباشرة من مجلد data/voice/:</label>
+            <label style="font-size: 11px; color: var(--text-muted);">Select sample from data/voice/:</label>
             <select id="voiceSelectDropdown" class="select-dropdown" onchange="handleVoiceDropdownSelect(this)">
-              <option value="">-- اختر ملف صوتي من الداتا --</option>
+              <option value="">-- Select Voice Sample from Dataset --</option>
             </select>
           </div>
 
           <!-- Stage Actions -->
           <div class="stage-actions" style="margin-top: 14px; justify-content: space-between;">
             <button id="btnRecordVoice" class="btn-primary" onclick="toggleAudioRecording()">
-              <span>🎤</span> تسجيل صوتي (2.5 ثانية)
+              <span>🎤</span> Record Audio (2.5s)
             </button>
             <button class="btn-test-single" onclick="verifySingleModality('voice')">
-              <span>🔍</span> فحص الصوت فقط
+              <span>🔍</span> Test Voice Only
             </button>
           </div>
         </div>
@@ -226,10 +236,10 @@
           <!-- Modality Input Tabs -->
           <div class="modality-tab-bar">
             <button id="fpTabUpload" class="modality-tab-btn active" onclick="setFpInputMode('upload')">
-              <span>📂</span> رفع بصمة من جهازك
+              <span>📂</span> Upload Fingerprint
             </button>
             <button id="fpTabDataset" class="modality-tab-btn" onclick="setFpInputMode('dataset')">
-              <span>📋</span> اختيار من الداتا
+              <span>📋</span> Choose from Dataset
             </button>
           </div>
 
@@ -237,7 +247,7 @@
             <img id="fpPreviewImg" class="fingerprint-img-preview" src="" style="display: none;">
             <div id="fpPlaceholder" class="camera-placeholder">
               <div class="cam-icon">👆</div>
-              <div style="font-size: 12px;">لم يتم اختيار صورة بصمة بعد</div>
+              <div style="font-size: 12px;">No fingerprint image loaded yet</div>
             </div>
             <div id="fpScanLine" class="radar-scan-line" style="display: none;"></div>
           </div>
@@ -246,30 +256,30 @@
           <div id="fpUploadSection" class="file-upload-container">
             <input type="file" id="fpFileInput" accept="image/*" style="display: none;" onchange="handleFpFileUpload(event)">
             <button class="btn-secondary" style="width: 100%; justify-content: center;" onclick="document.getElementById('fpFileInput').click()">
-              <span>📂</span> اختر ملف صورة بصمة من جهازك
+              <span>📂</span> Choose Fingerprint Image File
             </button>
             <div id="fpPickedName" class="file-picked-label" style="display: none;"></div>
           </div>
 
           <!-- Sub-panel for Dataset Selection Dropdown -->
           <div id="fpDatasetSection" class="file-upload-container" style="display: none;">
-            <label style="font-size: 11px; color: var(--text-muted);">اختر عينة مباشرة من مجلد data/fingerprint/:</label>
+            <label style="font-size: 11px; color: var(--text-muted);">Select sample from data/fingerprint/:</label>
             <select id="fpSelectDropdown" class="select-dropdown" onchange="handleFpDropdownSelect(this)">
-              <option value="">-- اختر ملف بصمة من الداتا --</option>
+              <option value="">-- Select Fingerprint Sample from Dataset --</option>
             </select>
           </div>
 
           <!-- Stage Actions -->
           <div class="stage-actions" style="margin-top: 14px; justify-content: flex-end;">
             <button class="btn-test-single" onclick="verifySingleModality('fingerprint')">
-              <span>🔍</span> فحص البصمة فقط
+              <span>🔍</span> Test Fingerprint Only
             </button>
           </div>
         </div>
 
         <!-- Run Cascade Action Button -->
         <button id="btnRunCascade" class="btn-cascade-full" onclick="executeFullCascade()">
-          🚀 تنفيذ الفحص الهرمي المتتابع (Cascade Mode D)
+          🚀 Run Biometric Gate Verification (2-of-3 Rule)
         </button>
       </div>
 
@@ -390,10 +400,13 @@
             <span id="dashRoleTitle">ROLE: SUPER ADMIN (FULL ACCESS)</span>
           </div>
         </div>
-        <div>
+        <div style="display: flex; gap: 12px; align-items: center;">
           <span id="sheetEditPermissionPill" class="system-status-pill" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">
             ✏️ Full Edit Mode Enabled
           </span>
+          <button class="btn-danger" style="padding: 7px 14px; font-size: 12px;" onclick="logoutAndResetGate()">
+            <span>🚪</span> Logout & Lock Gate
+          </button>
         </div>
       </div>
 

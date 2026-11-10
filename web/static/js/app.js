@@ -50,10 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   await loadPresets();
   await loadDatasetFiles();
   setupAudioVisualizer();
-  await fetchDashboardData();
-  
-  // Set default dataset paths initially
-  initDefaultDropdowns();
+  await logoutAndResetGate(false);
 });
 
 function startClock() {
@@ -92,7 +89,7 @@ function populateDatasetDropdowns() {
 
   // Face dropdown
   const faceSelect = document.getElementById("faceSelectDropdown");
-  faceSelect.innerHTML = '<option value="">-- اختر صورة وجه من الداتا --</option>';
+  faceSelect.innerHTML = '<option value="">-- Select Face Sample from Dataset --</option>';
   datasetFilesData.faces.forEach(item => {
     const opt = document.createElement("option");
     opt.value = item.path;
@@ -102,7 +99,7 @@ function populateDatasetDropdowns() {
 
   // Voice dropdown
   const voiceSelect = document.getElementById("voiceSelectDropdown");
-  voiceSelect.innerHTML = '<option value="">-- اختر ملف صوتي من الداتا --</option>';
+  voiceSelect.innerHTML = '<option value="">-- Select Voice Sample from Dataset --</option>';
   datasetFilesData.voices.forEach(item => {
     const opt = document.createElement("option");
     opt.value = item.path;
@@ -112,7 +109,7 @@ function populateDatasetDropdowns() {
 
   // Fingerprint dropdown
   const fpSelect = document.getElementById("fpSelectDropdown");
-  fpSelect.innerHTML = '<option value="">-- اختر صورة بصمة من الداتا --</option>';
+  fpSelect.innerHTML = '<option value="">-- Select Fingerprint Sample from Dataset --</option>';
   datasetFilesData.fingerprints.forEach(item => {
     const opt = document.createElement("option");
     opt.value = item.path;
@@ -122,19 +119,17 @@ function populateDatasetDropdowns() {
 }
 
 function initDefaultDropdowns() {
-  if (!presetsData) return;
-  const userPresets = presetsData[claimedUser] || presetsData["member1"];
-  selectedFacePath = userPresets.face_sample;
-  selectedVoicePath = userPresets.voice_sample;
-  selectedFpPath = userPresets.fp_sample;
+  // Keep dropdowns clear by default so nothing is auto-loaded
+  selectedFacePath = null;
+  selectedVoicePath = null;
+  selectedFpPath = null;
 
-  // Set dropdown values
   const faceSelect = document.getElementById("faceSelectDropdown");
-  if (faceSelect) faceSelect.value = selectedFacePath;
+  if (faceSelect) faceSelect.value = "";
   const voiceSelect = document.getElementById("voiceSelectDropdown");
-  if (voiceSelect) voiceSelect.value = selectedVoicePath;
+  if (voiceSelect) voiceSelect.value = "";
   const fpSelect = document.getElementById("fpSelectDropdown");
-  if (fpSelect) fpSelect.value = selectedFpPath;
+  if (fpSelect) fpSelect.value = "";
 }
 
 function selectClaimedUser(userId, btnEl) {
@@ -142,7 +137,7 @@ function selectClaimedUser(userId, btnEl) {
   document.querySelectorAll(".user-pill").forEach(p => p.classList.remove("active"));
   if (btnEl) btnEl.classList.add("active");
 
-  initDefaultDropdowns();
+  // Only reset verification state; NEVER automatically inject face or fingerprint previews
   resetVerificationState();
 }
 
@@ -222,8 +217,8 @@ function setFaceInputMode(mode) {
     } else {
       imgFace.style.display = "none";
       placeholder.style.display = "flex";
-      placeholder.querySelector("div:nth-child(2)").innerText = "يرجى رفع صورة الوجه من جهازك";
-      placeholder.querySelector("div:nth-child(3)").innerText = "اضغط على زر 'اختر ملف صورة'";
+      placeholder.querySelector("div:nth-child(2)").innerText = "Please upload face image from your device";
+      placeholder.querySelector("div:nth-child(3)").innerText = "Click 'Choose Face Image File'";
     }
   } else if (mode === "dataset") {
     stopCamera();
@@ -233,6 +228,11 @@ function setFaceInputMode(mode) {
       imgFace.src = "/" + selectedFacePath;
       imgFace.style.display = "block";
       placeholder.style.display = "none";
+    } else {
+      imgFace.style.display = "none";
+      placeholder.style.display = "flex";
+      placeholder.querySelector("div:nth-child(2)").innerText = "No face sample selected";
+      placeholder.querySelector("div:nth-child(3)").innerText = "Select a face sample from dropdown or use Live Webcam";
     }
   }
 }
@@ -249,11 +249,11 @@ function setVoiceInputMode(mode) {
 
   const statusTxt = document.getElementById("voiceStatusText");
   if (mode === "live") {
-    statusTxt.innerText = "جاهز: انطق عبارة 'Open security gate now'";
+    statusTxt.innerText = "Ready: Speak passphrase 'Open security gate now'";
   } else if (mode === "upload") {
-    statusTxt.innerText = uploadedVoiceFile ? `ملف مرفوع: ${uploadedVoiceFile.name}` : "يرجى اختيار ملف صوتي من جهازك (WAV)";
+    statusTxt.innerText = uploadedVoiceFile ? `Loaded: ${uploadedVoiceFile.name}` : "Please choose audio file from your device (WAV)";
   } else if (mode === "dataset") {
-    statusTxt.innerText = selectedVoicePath ? `عينة محددة: ${selectedVoicePath.split("/").pop()}` : "اختر عينة صوتية من القائمة";
+    statusTxt.innerText = selectedVoicePath ? `Selected sample: ${selectedVoicePath.split("/").pop()}` : "Select voice sample from dataset list";
   }
 }
 
@@ -275,7 +275,7 @@ function setFpInputMode(mode) {
     } else {
       preview.style.display = "none";
       placeholder.style.display = "flex";
-      placeholder.querySelector("div:last-child").innerText = "يرجى رفع صورة البصمة من جهازك";
+      placeholder.querySelector("div:last-child").innerText = "Please upload fingerprint image from your device";
     }
   } else if (mode === "dataset") {
     if (selectedFpPath) {
@@ -298,7 +298,7 @@ function handleFaceFileUpload(event) {
   capturedFaceBlob = null; // Clear live capture if any
 
   const labelEl = document.getElementById("facePickedName");
-  labelEl.innerText = `ملف محدد: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  labelEl.innerText = `File: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   labelEl.style.display = "inline-block";
 
   // Show preview
@@ -321,9 +321,9 @@ function handleVoiceFileUpload(event) {
   recordedAudioBlob = null; // Clear mic record
 
   const labelEl = document.getElementById("voicePickedName");
-  labelEl.innerText = `ملف صوتي: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  labelEl.innerText = `Audio: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   labelEl.style.display = "inline-block";
-  document.getElementById("voiceStatusText").innerText = `تم تحميل الملف: ${file.name}`;
+  document.getElementById("voiceStatusText").innerText = `Audio loaded: ${file.name}`;
 }
 
 function handleFpFileUpload(event) {
@@ -333,7 +333,7 @@ function handleFpFileUpload(event) {
   uploadedFpFile = file;
 
   const labelEl = document.getElementById("fpPickedName");
-  labelEl.innerText = `ملف بصمة: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+  labelEl.innerText = `Fingerprint: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
   labelEl.style.display = "inline-block";
 
   const reader = new FileReader();
@@ -352,29 +352,41 @@ function handleFpFileUpload(event) {
 
 function handleFaceDropdownSelect(selectEl) {
   selectedFacePath = selectEl.value;
+  const imgFace = document.getElementById("presetFaceImg");
+  const camPlaceholder = document.getElementById("camPlaceholder");
   if (selectedFacePath) {
-    const imgFace = document.getElementById("presetFaceImg");
     imgFace.src = "/" + selectedFacePath;
     imgFace.style.display = "block";
-    document.getElementById("camPlaceholder").style.display = "none";
+    camPlaceholder.style.display = "none";
     document.getElementById("webcamVideo").style.display = "none";
+  } else {
+    imgFace.style.display = "none";
+    imgFace.src = "";
+    camPlaceholder.style.display = "flex";
   }
 }
 
 function handleVoiceDropdownSelect(selectEl) {
   selectedVoicePath = selectEl.value;
   if (selectedVoicePath) {
-    document.getElementById("voiceStatusText").innerText = `عينة داتا: ${selectedVoicePath.split("/").pop()}`;
+    document.getElementById("voiceStatusText").innerText = `Dataset Sample: ${selectedVoicePath.split("/").pop()}`;
+  } else {
+    document.getElementById("voiceStatusText").innerText = "Select voice sample from dataset list";
   }
 }
 
 function handleFpDropdownSelect(selectEl) {
   selectedFpPath = selectEl.value;
+  const preview = document.getElementById("fpPreviewImg");
+  const placeholder = document.getElementById("fpPlaceholder");
   if (selectedFpPath) {
-    const preview = document.getElementById("fpPreviewImg");
     preview.src = "/" + selectedFpPath;
     preview.style.display = "block";
-    document.getElementById("fpPlaceholder").style.display = "none";
+    placeholder.style.display = "none";
+  } else {
+    preview.style.display = "none";
+    preview.src = "";
+    placeholder.style.display = "flex";
   }
 }
 
@@ -400,11 +412,11 @@ async function toggleCamera() {
       video.style.display = "block";
       placeholder.style.display = "none";
       radar.style.display = "block";
-      btnStart.innerHTML = "<span>⏹️</span> إيقاف الكاميرا";
+      btnStart.innerHTML = "<span>⏹️</span> Stop Camera";
       btnStart.classList.replace("btn-primary", "btn-secondary");
       btnCap.style.display = "inline-flex";
     } catch (err) {
-      alert("تعذر فتح الكاميرا: " + err.message + "\nتأكد من إعطاء المتصفح إذن الكاميرا (Camera Permission) في شريط العنوان.");
+      alert("Unable to access camera: " + err.message + "\nPlease grant camera permission in your browser address bar.");
     }
   }
 }
@@ -422,7 +434,7 @@ function stopCamera() {
   if (video) video.style.display = "none";
   if (radar) radar.style.display = "none";
   if (btnStart) {
-    btnStart.innerHTML = "<span>📹</span> تشغيل الكاميرا";
+    btnStart.innerHTML = "<span>📹</span> Start Camera";
     btnStart.classList.replace("btn-secondary", "btn-primary");
   }
   if (btnCap) btnCap.style.display = "none";
@@ -432,7 +444,7 @@ function captureFaceSnapshot() {
   const video = document.getElementById("webcamVideo");
   const canvas = document.getElementById("capturedFaceCanvas");
   if (!webcamStream) {
-    alert("يرجى تشغيل الكاميرا أولاً!");
+    alert("Please start the camera first!");
     return;
   }
 
@@ -448,7 +460,7 @@ function captureFaceSnapshot() {
     video.style.display = "none";
     stopCamera();
     document.getElementById("camPlaceholder").style.display = "none";
-    alert("تم التقاط لقطة الوجه بنجاح!");
+    alert("Face snapshot captured successfully!");
   }, "image/jpeg", 0.95);
 }
 
@@ -506,23 +518,23 @@ async function toggleAudioRecording() {
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
         recordedAudioBlob = encodeWAV(audioBuffer, 16000);
         uploadedVoiceFile = null;
-        statusTxt.innerText = "تم تسجيل صوتك وتحويله لصيغة 16kHz WAV بنجاح! جاهز للفحص.";
+        statusTxt.innerText = "Voice recorded and converted to 16kHz WAV successfully! Ready for test.";
       } catch (e) {
         console.warn("WAV conversion fallback:", e);
         recordedAudioBlob = new Blob(audioChunks, { type: "audio/wav" });
-        statusTxt.innerText = "تم تسجيل الصوت بنجاح! جاهز للفحص.";
+        statusTxt.innerText = "Voice recording ready for verification.";
       }
 
       stream.getTracks().forEach(t => t.stop());
       cancelAnimationFrame(waveAnimFrame);
-      btn.innerHTML = "<span>🎤</span> تسجيل صوتي (2.5 ثانية)";
+      btn.innerHTML = "<span>🎤</span> Record Audio (2.5s)";
       btn.classList.replace("btn-danger", "btn-primary");
     };
 
     audioRecorder.start();
-    btn.innerHTML = "<span>⏹️</span> جاري التسجيل... تكلم الآن";
+    btn.innerHTML = "<span>⏹️</span> Recording... Speak passphrase now";
     btn.classList.replace("btn-primary", "btn-danger");
-    statusTxt.innerText = "تسجيل حي: انطق 'Open security gate now'...";
+    statusTxt.innerText = "Recording live: Speak 'Open security gate now'...";
 
     renderWaveform();
 
@@ -532,7 +544,7 @@ async function toggleAudioRecording() {
       }
     }, 2500);
   } catch (err) {
-    alert("تعذر الوصول إلى المايكروفون: " + err.message + "\nتأكد من إعطاء إذن المايك في المتصفح.");
+    alert("Unable to access microphone: " + err.message + "\nPlease grant microphone permission in your browser.");
   }
 }
 
@@ -635,19 +647,19 @@ async function verifySingleModality(modality) {
     endpoint = "/api/verify/face";
     if (faceInputMode === "live") {
       if (!capturedFaceBlob) {
-        alert("يرجى تشغيل الكاميرا والتقاط لقطة أولاً (Capture Snapshot).");
+        alert("Webcam is inactive. Please click 'Start Camera' and then 'Capture Snapshot' first.");
         return;
       }
       formData.append("image", capturedFaceBlob, "face.jpg");
     } else if (faceInputMode === "upload") {
       if (!uploadedFaceFile) {
-        alert("يرجى اختيار ملف صورة من جهازك أولاً.");
+        alert("Please upload a face image file from your device first.");
         return;
       }
       formData.append("image", uploadedFaceFile);
     } else {
       if (!selectedFacePath) {
-        alert("يرجى اختيار عينة من قائمة الداتا.");
+        alert("Please select a face sample from the dataset dropdown.");
         return;
       }
       formData.append("preset_path", selectedFacePath);
@@ -656,19 +668,19 @@ async function verifySingleModality(modality) {
     endpoint = "/api/verify/voice";
     if (voiceInputMode === "live") {
       if (!recordedAudioBlob) {
-        alert("يرجى الضغط على زر التسجيل ونطق العبارة أولاً.");
+        alert("Please click 'Record Audio' and speak the passphrase first.");
         return;
       }
       formData.append("audio", recordedAudioBlob, "voice.wav");
     } else if (voiceInputMode === "upload") {
       if (!uploadedVoiceFile) {
-        alert("يرجى اختيار ملف صوتي من جهازك أولاً.");
+        alert("Please upload an audio file from your device first.");
         return;
       }
       formData.append("audio", uploadedVoiceFile);
     } else {
       if (!selectedVoicePath) {
-        alert("يرجى اختيار عينة صوتية من قائمة الداتا.");
+        alert("Please select a voice sample from the dataset dropdown.");
         return;
       }
       formData.append("preset_path", selectedVoicePath);
@@ -677,13 +689,13 @@ async function verifySingleModality(modality) {
     endpoint = "/api/verify/fingerprint";
     if (fpInputMode === "upload") {
       if (!uploadedFpFile) {
-        alert("يرجى اختيار ملف صورة بصمة من جهازك أولاً.");
+        alert("Please upload a fingerprint image file from your device first.");
         return;
       }
       formData.append("image", uploadedFpFile);
     } else {
       if (!selectedFpPath) {
-        alert("يرجى اختيار عينة بصمة من قائمة الداتا.");
+        alert("Please select a fingerprint sample from the dataset dropdown.");
         return;
       }
       formData.append("preset_path", selectedFpPath);
@@ -695,13 +707,13 @@ async function verifySingleModality(modality) {
     const result = await res.json();
 
     if (!res.ok) {
-      alert("خطأ أثناء الفحص: " + (result.detail || res.statusText));
+      alert("Verification error: " + (result.detail || res.statusText));
       return;
     }
 
     displaySingleResult(modality, result);
   } catch (err) {
-    alert("تعذر الاتصال بالسيرفر: " + err.message);
+    alert("Connection error: " + err.message);
   }
 }
 
@@ -715,7 +727,7 @@ function displaySingleResult(modality, res) {
     const badge = document.getElementById("badgeFace");
     card.className = "stage-card " + (isVerified ? "passed" : "failed");
     badge.className = "stage-badge " + (isVerified ? "passed" : "failed");
-    badge.innerText = isVerified ? `مقبول (${scorePct}%)` : `مرفوض (${scorePct}%)`;
+    badge.innerText = isVerified ? `PASSED (${scorePct}%)` : `FAILED (${scorePct}%)`;
 
     document.getElementById("faceScoreVal").innerText = scorePct + "%";
     document.getElementById("faceBarFill").style.width = scorePct + "%";
@@ -726,7 +738,7 @@ function displaySingleResult(modality, res) {
     const badge = document.getElementById("badgeVoice");
     card.className = "stage-card " + (isVerified ? "passed" : "failed");
     badge.className = "stage-badge " + (isVerified ? "passed" : "failed");
-    badge.innerText = isVerified ? `مقبول (${scorePct}%)` : `مرفوض (${scorePct}%)`;
+    badge.innerText = isVerified ? `PASSED (${scorePct}%)` : `FAILED (${scorePct}%)`;
 
     document.getElementById("voiceScoreVal").innerText = scorePct + "%";
     document.getElementById("voiceBarFill").style.width = scorePct + "%";
@@ -737,7 +749,7 @@ function displaySingleResult(modality, res) {
     const badge = document.getElementById("badgeFp");
     card.className = "stage-card " + (isVerified ? "passed" : "failed");
     badge.className = "stage-badge " + (isVerified ? "passed" : "failed");
-    badge.innerText = isVerified ? `مقبول (${scorePct}%)` : `مرفوض (${scorePct}%)`;
+    badge.innerText = isVerified ? `PASSED (${scorePct}%)` : `FAILED (${scorePct}%)`;
 
     document.getElementById("fpScoreVal").innerText = scorePct + "%";
     document.getElementById("fpBarFill").style.width = scorePct + "%";
@@ -748,7 +760,7 @@ function displaySingleResult(modality, res) {
   const banner = document.getElementById("decisionBanner");
   banner.className = "decision-banner " + (isVerified ? "granted" : "denied");
   document.getElementById("decisionTitle").innerText = isVerified ? "MODALITY VERIFIED" : "MODALITY REJECTED";
-  document.getElementById("decisionDesc").innerText = `فحص نمط ${modality.toUpperCase()} للمستخدم ${res.user_id}: نسبة التطابق ${scorePct}%`;
+  document.getElementById("decisionDesc").innerText = `${modality.toUpperCase()} test for ${res.user_name || res.user_id}: match score ${scorePct}%`;
 }
 
 // ---------------------------------------------------------------------------
@@ -770,18 +782,18 @@ async function runPresetDemo(demoType) {
     selectedFacePath = presetsData.member2.face_sample;
     selectedVoicePath = presetsData.member2.voice_sample;
     selectedFpPath = presetsData.member2.fp_sample;
+  } else if (demoType === "member3_genuine") {
+    claimedUser = "member3";
+    document.querySelectorAll(".user-pill").forEach((p, idx) => p.classList.toggle("active", idx === 2));
+    selectedFacePath = presetsData.member3.face_sample;
+    selectedVoicePath = presetsData.member3.voice_sample;
+    selectedFpPath = presetsData.member3.fp_sample;
   } else if (demoType === "impostor_attack") {
     claimedUser = "member1"; // Attack member 1's identity
-    document.querySelectorAll(".user-pill").forEach((p, idx) => p.classList.toggle("active", idx === 0));
+    document.querySelectorAll(".user-pill").forEach((p, idx) => p.classList.toggle("active", idx === 3));
     selectedFacePath = presetsData.impostor.face_sample;
     selectedVoicePath = presetsData.impostor.voice_sample;
     selectedFpPath = presetsData.impostor.fp_sample;
-  } else if (demoType === "spoof_voice") {
-    claimedUser = "member1";
-    document.querySelectorAll(".user-pill").forEach((p, idx) => p.classList.toggle("active", idx === 0));
-    selectedFacePath = presetsData.member1.face_sample; // right face
-    selectedVoicePath = presetsData.impostor.voice_sample; // wrong voice!
-    selectedFpPath = presetsData.member1.fp_sample;
   }
 
   // Switch tabs to dataset mode for clear visual feedback
@@ -806,63 +818,68 @@ async function runPresetDemo(demoType) {
 
 async function executeFullCascade() {
   const btn = document.getElementById("btnRunCascade");
+
+  const hasFace = (faceInputMode === "live" && Boolean(capturedFaceBlob)) ||
+                  (faceInputMode === "upload" && Boolean(uploadedFaceFile)) ||
+                  (faceInputMode === "dataset" && Boolean(selectedFacePath));
+
+  const hasVoice = (voiceInputMode === "live" && Boolean(recordedAudioBlob)) ||
+                   (voiceInputMode === "upload" && Boolean(uploadedVoiceFile)) ||
+                   (voiceInputMode === "dataset" && Boolean(selectedVoicePath));
+
+  const hasFp = (fpInputMode === "upload" && Boolean(uploadedFpFile)) ||
+                (fpInputMode === "dataset" && Boolean(selectedFpPath));
+
+  if (!hasFace && !hasVoice && !hasFp) {
+    alert("Please provide at least one biometric input (Webcam snapshot, Voice recording, or Fingerprint image).");
+    return;
+  }
+
   btn.disabled = true;
-  btn.innerText = "⏳ جاري تنفيذ الفحص الهرمي المتتابع (Cascade Mode D)...";
+  btn.innerText = "⏳ Running Multimodal Verification (2-of-3 Rule)...";
 
   const formData = new FormData();
   formData.append("user_id", claimedUser);
 
-  // 1. Resolve Face
+  // 1. Resolve Face - ONLY send if user actually provided it
   if (faceInputMode === "live") {
-    if (!capturedFaceBlob) {
-      alert("تنبيه: الكاميرا الحية محددة ولكن لم يتم التقاط لقطة بعد! يرجى تشغيل الكاميرا والضغط على 'التقاط لقطة'، أو التبديل إلى 'اختيار من الداتا'.");
-      btn.disabled = false;
-      btn.innerText = "🚀 تنفيذ الفحص الهرمي المتتابع (Cascade Mode D)";
-      return;
+    if (capturedFaceBlob) {
+      formData.append("face_image", capturedFaceBlob, "face.jpg");
     }
-    formData.append("face_image", capturedFaceBlob, "face.jpg");
   } else if (faceInputMode === "upload") {
-    if (!uploadedFaceFile) {
-      alert("تنبيه: يرجى رفع صورة الوجه من جهازك أولاً.");
-      btn.disabled = false;
-      btn.innerText = "🚀 تنفيذ الفحص الهرمي المتتابع (Cascade Mode D)";
-      return;
+    if (uploadedFaceFile) {
+      formData.append("face_image", uploadedFaceFile);
     }
-    formData.append("face_image", uploadedFaceFile);
-  } else {
-    if (!selectedFacePath) {
-      selectedFacePath = presetsData[claimedUser]?.face_sample;
+  } else if (faceInputMode === "dataset") {
+    if (selectedFacePath) {
+      formData.append("face_preset", selectedFacePath);
     }
-    formData.append("face_preset", selectedFacePath);
   }
 
-  // 2. Resolve Voice
+  // 2. Resolve Voice - ONLY send if user actually provided it
   if (voiceInputMode === "live") {
     if (recordedAudioBlob) {
       formData.append("voice_audio", recordedAudioBlob, "voice.wav");
-    } else {
-      // Fallback to sample if not spoken
-      formData.append("voice_preset", presetsData[claimedUser]?.voice_sample);
     }
   } else if (voiceInputMode === "upload") {
     if (uploadedVoiceFile) {
       formData.append("voice_audio", uploadedVoiceFile);
-    } else {
-      formData.append("voice_preset", presetsData[claimedUser]?.voice_sample);
     }
-  } else {
-    formData.append("voice_preset", selectedVoicePath || presetsData[claimedUser]?.voice_sample);
+  } else if (voiceInputMode === "dataset") {
+    if (selectedVoicePath) {
+      formData.append("voice_preset", selectedVoicePath);
+    }
   }
 
-  // 3. Resolve Fingerprint
+  // 3. Resolve Fingerprint - ONLY send if user actually provided it
   if (fpInputMode === "upload") {
     if (uploadedFpFile) {
       formData.append("fp_image", uploadedFpFile);
-    } else {
-      formData.append("fp_preset", presetsData[claimedUser]?.fp_sample);
     }
-  } else {
-    formData.append("fp_preset", selectedFpPath || presetsData[claimedUser]?.fp_sample);
+  } else if (fpInputMode === "dataset") {
+    if (selectedFpPath) {
+      formData.append("fp_preset", selectedFpPath);
+    }
   }
 
   try {
@@ -873,25 +890,26 @@ async function executeFullCascade() {
     const data = await res.json();
 
     if (!res.ok) {
-      alert("خطأ في التحقق: " + (data.detail || res.statusText));
+      alert("Verification error: " + (data.detail || res.statusText));
       return;
     }
 
     displayCascadeResults(data);
   } catch (err) {
-    alert("تعذر الاتصال بالسيرفر: " + err.message);
+    alert("Connection error: " + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerText = "🚀 تنفيذ الفحص الهرمي المتتابع (Cascade Mode D)";
+    btn.innerText = "🚀 Run Biometric Gate Verification (2-of-3 Rule)";
   }
 }
 
 function displayCascadeResults(data) {
   const isGranted = data.decision;
-  const lvl = data.level_reached;
+  const passedCount = data.passed_count !== undefined ? data.passed_count : data.level_reached;
   const scores = data.scores || {};
   const th = data.thresholds || {};
   const timing = data.time_per_stage || {};
+  const passedMods = data.passed_modalities || {};
 
   // Decision Banner
   const banner = document.getElementById("decisionBanner");
@@ -900,8 +918,8 @@ function displayCascadeResults(data) {
 
   if (isGranted) {
     banner.className = "decision-banner granted";
-    title.innerText = "ACCESS GRANTED [LEVEL " + lvl + "]";
-    desc.innerText = `تم تأكيد الهوية بنجاح: ${data.user_id.toUpperCase()} (${data.role})`;
+    title.innerText = `ACCESS GRANTED [${passedCount}/3 VERIFIED]`;
+    desc.innerText = `Identity verified: ${data.user_name || data.user_id} (${data.role}) - Policy satisfied (2-of-3 passed).`;
     document.getElementById("gateStatusText").innerText = "PERIMETER: UNLOCKED";
     document.getElementById("gateStatusBadge").style.borderColor = "var(--accent-green)";
     document.getElementById("gateStatusBadge").style.color = "var(--accent-green)";
@@ -909,18 +927,18 @@ function displayCascadeResults(data) {
 
     currentSessionToken = data.session_token;
     currentRoleKey = data.role_key;
-    document.getElementById("headerUserText").innerText = `${data.user_id} (${data.role})`;
+    document.getElementById("headerUserText").innerText = `${data.user_name || data.user_id} (${data.role})`;
   } else {
     banner.className = "decision-banner denied";
-    title.innerText = "ACCESS DENIED";
-    desc.innerText = `تم رفض الدخول وتوقف الفحص عند: ${data.stopped_at.toUpperCase()} (Level ${lvl})`;
+    title.innerText = `ACCESS DENIED [${passedCount}/3 VERIFIED]`;
+    desc.innerText = `Access Denied: Only ${passedCount} of 3 modalities verified (minimum 2 required).`;
     document.getElementById("gateStatusText").innerText = "PERIMETER: LOCKED";
     document.getElementById("gateStatusBadge").style.borderColor = "var(--accent-red)";
     document.getElementById("gateStatusBadge").style.color = "var(--accent-red)";
     document.getElementById("dashboardUnlockBox").style.display = "none";
   }
 
-  // Stage Cards & Badges
+  // Modality States
   const cardFace = document.getElementById("stageFaceCard");
   const badgeFace = document.getElementById("badgeFace");
   const cardVoice = document.getElementById("stageVoiceCard");
@@ -928,79 +946,83 @@ function displayCascadeResults(data) {
   const cardFp = document.getElementById("stageFpCard");
   const badgeFp = document.getElementById("badgeFp");
 
-  if (lvl >= 1 || (lvl === 0 && isGranted)) {
-    cardFace.className = "stage-card passed";
-    badgeFace.className = "stage-badge passed";
-    badgeFace.innerText = "PASSED";
+  const faceTested = scores.face !== null && scores.face !== undefined;
+  const voiceTested = scores.voice !== null && scores.voice !== undefined;
+  const fpTested = scores.fingerprint !== null && scores.fingerprint !== undefined;
+
+  const facePassed = faceTested && Boolean(passedMods.face);
+  const voicePassed = voiceTested && Boolean(passedMods.voice);
+  const fpPassed = fpTested && Boolean(passedMods.fingerprint);
+
+  // Face Card & Meter
+  if (!faceTested) {
+    cardFace.className = "stage-card";
+    badgeFace.className = "stage-badge";
+    badgeFace.innerText = "NOT PROVIDED";
+    document.getElementById("faceScoreVal").innerText = "Not Tested";
+    document.getElementById("faceBarFill").style.width = "0%";
+    document.getElementById("faceBarFill").className = "metric-bar-fill";
   } else {
-    cardFace.className = "stage-card failed";
-    badgeFace.className = "stage-badge failed";
-    badgeFace.innerText = "FAILED / REJECTED";
+    cardFace.className = "stage-card " + (facePassed ? "passed" : "failed");
+    badgeFace.className = "stage-badge " + (facePassed ? "passed" : "failed");
+    badgeFace.innerText = facePassed ? `PASSED (${((scores.face || 0) * 100).toFixed(1)}%)` : `FAILED (${((scores.face || 0) * 100).toFixed(1)}%)`;
+    document.getElementById("faceScoreVal").innerText = ((scores.face || 0) * 100).toFixed(1) + "%";
+    document.getElementById("faceBarFill").style.width = Math.min(100, (scores.face || 0) * 100) + "%";
+    document.getElementById("faceBarFill").className = "metric-bar-fill " + (facePassed ? "passed" : "failed");
   }
 
-  if (lvl >= 2) {
-    cardVoice.className = "stage-card passed";
-    badgeVoice.className = "stage-badge passed";
-    badgeVoice.innerText = "PASSED";
-  } else if (lvl === 1) {
-    cardVoice.className = "stage-card failed";
-    badgeVoice.className = "stage-badge failed";
-    badgeVoice.innerText = "FAILED / REJECTED";
-  } else {
+  // Voice Card & Meter
+  if (!voiceTested) {
     cardVoice.className = "stage-card";
     badgeVoice.className = "stage-badge";
-    badgeVoice.innerText = "BYPASSED (EARLY EXIT)";
-  }
-
-  if (lvl >= 3) {
-    cardFp.className = "stage-card passed";
-    badgeFp.className = "stage-badge passed";
-    badgeFp.innerText = "PASSED (MAX LEVEL)";
-  } else if (lvl === 2) {
-    cardFp.className = "stage-card";
-    badgeFp.className = "stage-badge";
-    badgeFp.innerText = "OPTIONAL PASSED";
+    badgeVoice.innerText = "NOT PROVIDED";
+    document.getElementById("voiceScoreVal").innerText = "Not Tested";
+    document.getElementById("voiceBarFill").style.width = "0%";
+    document.getElementById("voiceBarFill").className = "metric-bar-fill";
   } else {
-    cardFp.className = "stage-card";
-    badgeFp.className = "stage-badge";
-    badgeFp.innerText = "SKIPPED";
+    cardVoice.className = "stage-card " + (voicePassed ? "passed" : "failed");
+    badgeVoice.className = "stage-badge " + (voicePassed ? "passed" : "failed");
+    badgeVoice.innerText = voicePassed ? `PASSED (${((scores.voice || 0) * 100).toFixed(1)}%)` : `FAILED (${((scores.voice || 0) * 100).toFixed(1)}%)`;
+    document.getElementById("voiceScoreVal").innerText = ((scores.voice || 0) * 100).toFixed(1) + "%";
+    document.getElementById("voiceBarFill").style.width = Math.min(100, (scores.voice || 0) * 100) + "%";
+    document.getElementById("voiceBarFill").className = "metric-bar-fill " + (voicePassed ? "passed" : "failed");
   }
 
-  // Modality Confidence Meters
-  const faceScore = scores.face !== null ? scores.face : 0.0;
-  const fusionScore = scores.fusion !== null ? scores.fusion : (scores.voice !== null ? scores.voice : 0.0);
-  const fpScore = scores.fingerprint !== null ? scores.fingerprint : 0.0;
+  // Fingerprint Card & Meter
+  if (!fpTested) {
+    cardFp.className = "stage-card";
+    badgeFp.className = "stage-badge";
+    badgeFp.innerText = "NOT PROVIDED";
+    document.getElementById("fpScoreVal").innerText = "Not Tested";
+    document.getElementById("fpBarFill").style.width = "0%";
+    document.getElementById("fpBarFill").className = "metric-bar-fill";
+  } else {
+    cardFp.className = "stage-card " + (fpPassed ? "passed" : "failed");
+    badgeFp.className = "stage-badge " + (fpPassed ? "passed" : "failed");
+    badgeFp.innerText = fpPassed ? `PASSED (${((scores.fingerprint || 0) * 100).toFixed(1)}%)` : `FAILED (${((scores.fingerprint || 0) * 100).toFixed(1)}%)`;
+    document.getElementById("fpScoreVal").innerText = ((scores.fingerprint || 0) * 100).toFixed(1) + "%";
+    document.getElementById("fpBarFill").style.width = Math.min(100, (scores.fingerprint || 0) * 100) + "%";
+    document.getElementById("fpBarFill").className = "metric-bar-fill " + (fpPassed ? "passed" : "failed");
+  }
 
-  document.getElementById("faceScoreVal").innerText = (faceScore * 100).toFixed(1) + "%";
-  document.getElementById("faceBarFill").style.width = Math.min(100, faceScore * 100) + "%";
-  document.getElementById("faceBarFill").className = "metric-bar-fill " + (faceScore >= (th.T_low || 0.5) ? "passed" : "failed");
+  // Latencies
+  document.getElementById("timeFace").innerText = (faceTested && timing.level1_face ? timing.level1_face.toFixed(1) + " ms" : "--");
+  document.getElementById("exitFace").innerText = !faceTested ? "SKIPPED" : (facePassed ? "PASS" : "FAIL");
 
-  document.getElementById("voiceScoreVal").innerText = (fusionScore * 100).toFixed(1) + "%";
-  document.getElementById("voiceBarFill").style.width = Math.min(100, fusionScore * 100) + "%";
-  document.getElementById("voiceBarFill").className = "metric-bar-fill " + (fusionScore >= (th.T_fusion || 0.5) ? "passed" : "failed");
+  document.getElementById("timeVoice").innerText = (voiceTested && timing.level2_voice_fusion ? timing.level2_voice_fusion.toFixed(1) + " ms" : "--");
+  document.getElementById("exitVoice").innerText = !voiceTested ? "SKIPPED" : (voicePassed ? "PASS" : "FAIL");
 
-  document.getElementById("fpScoreVal").innerText = (fpScore * 100).toFixed(1) + "%";
-  document.getElementById("fpBarFill").style.width = Math.min(100, fpScore * 100) + "%";
-  document.getElementById("fpBarFill").className = "metric-bar-fill " + (fpScore >= (th.T_fp || 0.2) ? "passed" : "failed");
+  document.getElementById("timeFp").innerText = (fpTested && timing.level3_fingerprint ? timing.level3_fingerprint.toFixed(1) + " ms" : "--");
+  document.getElementById("exitFp").innerText = !fpTested ? "SKIPPED" : (fpPassed ? "PASS" : "FAIL");
+
+  document.getElementById("timeTotal").innerText = (data.total_time_ms ? data.total_time_ms.toFixed(1) + " ms" : "--");
 
   // Threshold labels
   if (th.T_low) document.getElementById("tLowVal").innerText = (th.T_low * 100).toFixed(0) + "%";
   if (th.T_fusion) document.getElementById("tFusionVal").innerText = (th.T_fusion * 100).toFixed(0) + "%";
   if (th.T_fp) document.getElementById("tFpVal").innerText = (th.T_fp * 100).toFixed(0) + "%";
 
-  // Latency Table
-  document.getElementById("timeFace").innerText = timing.level1_face ? timing.level1_face.toFixed(1) + " ms" : "--";
-  document.getElementById("exitFace").innerText = data.stopped_at === "level1" ? "YES (Stop)" : "Proceeded";
-
-  document.getElementById("timeVoice").innerText = timing.level2_voice_fusion ? timing.level2_voice_fusion.toFixed(1) + " ms" : "--";
-  document.getElementById("exitVoice").innerText = data.stopped_at === "level2" ? "YES (Stop)" : (timing.level2_voice_fusion ? "Proceeded" : "Skipped");
-
-  document.getElementById("timeFp").innerText = timing.level3_fingerprint ? timing.level3_fingerprint.toFixed(1) + " ms" : "--";
-  document.getElementById("exitFp").innerText = timing.level3_fingerprint ? "Completed" : "Skipped";
-
-  document.getElementById("timeTotal").innerText = data.total_time_ms ? data.total_time_ms.toFixed(1) + " ms" : "--";
-
-  // Refresh Dashboard Data in background
+  // Update audit log and dashboard
   fetchDashboardData();
 }
 
@@ -1058,28 +1080,29 @@ function renderDashboardUser(user) {
   const btnEmerg = document.getElementById("btnEmergencyLock");
 
   if (user && user.authenticated) {
-    nameEl.innerText = user.user_id === "member1" ? "Member 1 (Primary Admin)" : "Member 2 (Operator)";
-    roleEl.innerText = `ROLE: ${user.role.toUpperCase()} (LEVEL ${user.level_reached})`;
-    avatarEl.innerText = user.role_key === "super_admin" ? "👑" : "🛠️";
+    const displayName = user.full_name || (user.user_id === "member1" ? "Abdelrahman Wael (Super Admin)" : (user.user_id === "member2" ? "Hashem (Operator)" : "Hagar (Security Auditor)"));
+    nameEl.innerText = displayName;
+    roleEl.innerText = `ROLE: ${user.role.toUpperCase()} (VERIFIED: ${user.level_reached}/3 MODALITIES)`;
+    avatarEl.innerText = user.role_key === "super_admin" ? "👑" : (user.role_key === "operator" ? "⚙️" : "🔍");
 
     if (user.can_edit_sheet) {
       pillEl.className = "system-status-pill";
       pillEl.style.borderColor = "var(--accent-green)";
       pillEl.style.color = "var(--accent-green)";
-      pillEl.innerHTML = "✏️ Full Edit Mode Enabled (Super Admin)";
+      pillEl.innerHTML = "✏️ Full Edit Mode Enabled (Super Admin: Abdelrahman Wael)";
     } else {
       pillEl.className = "system-status-pill";
       pillEl.style.borderColor = "var(--accent-amber)";
       pillEl.style.color = "var(--accent-amber)";
-      pillEl.innerHTML = "🔒 View-Only Mode (Operator)";
+      pillEl.innerHTML = `🔒 View-Only Mode (${user.role})`;
     }
 
     if (user.can_access_vault) {
-      vaultNotice.innerHTML = "Access Authorized: <strong>Super Admin Key Validated</strong>.";
+      vaultNotice.innerHTML = "Access Authorized: <strong>Super Admin Key Validated (Abdelrahman Wael)</strong>.";
       btnVault.disabled = false;
       btnEmerg.disabled = false;
     } else {
-      vaultNotice.innerHTML = "Restricted: <strong>Operator account lacks Core Vault clearance</strong>.";
+      vaultNotice.innerHTML = `Restricted: <strong>${user.role} lacks Core Vault clearance</strong>.`;
       btnVault.disabled = true;
       btnEmerg.disabled = true;
     }
@@ -1235,7 +1258,7 @@ async function saveServerEdit(event) {
 
 async function executeGateAction(action) {
   if (!currentSessionToken) {
-    alert("يرجى التحقق من هويتك عند البوابة أولاً!");
+    alert("Please verify your identity at the biometric gate first!");
     switchView("gate");
     return;
   }
@@ -1251,7 +1274,7 @@ async function executeGateAction(action) {
 
     const data = await res.json();
     if (!res.ok) {
-      alert("تم رفض العملية: " + (data.detail || res.statusText));
+      alert("Action denied: " + (data.detail || res.statusText));
       return;
     }
 
@@ -1262,6 +1285,98 @@ async function executeGateAction(action) {
       document.getElementById("gateStatusText").innerText = "PERIMETER: LOCKED";
     }
   } catch (err) {
-    alert("فشلت عملية البوابة: " + err.message);
+    alert("Gate action failed: " + err.message);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Gate Logout & Full State Reset
+// ---------------------------------------------------------------------------
+
+async function logoutAndResetGate(callServer = true) {
+  if (callServer) {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+    } catch (e) {
+      console.warn("Logout request failed:", e);
+    }
+  }
+
+  // 1. Reset Session & Auth state
+  currentSessionToken = null;
+  currentRoleKey = "guest";
+
+  // 2. Clear all input buffers & selected files
+  stopCamera();
+  capturedFaceBlob = null;
+  uploadedFaceFile = null;
+  selectedFacePath = null;
+
+  recordedAudioBlob = null;
+  uploadedVoiceFile = null;
+  selectedVoicePath = null;
+
+  uploadedFpFile = null;
+  selectedFpPath = null;
+
+  // 3. Reset input elements & file selectors
+  const faceInput = document.getElementById("faceFileInput");
+  if (faceInput) faceInput.value = "";
+  const voiceInput = document.getElementById("voiceFileInput");
+  if (voiceInput) voiceInput.value = "";
+  const fpInput = document.getElementById("fpFileInput");
+  if (fpInput) fpInput.value = "";
+
+  const facePick = document.getElementById("facePickedName");
+  if (facePick) { facePick.innerText = ""; facePick.style.display = "none"; }
+  const voicePick = document.getElementById("voicePickedName");
+  if (voicePick) { voicePick.innerText = ""; voicePick.style.display = "none"; }
+  const fpPick = document.getElementById("fpPickedName");
+  if (fpPick) { fpPick.innerText = ""; fpPick.style.display = "none"; }
+
+  // 4. Reset dataset dropdowns to empty placeholder
+  const faceSelect = document.getElementById("faceSelectDropdown");
+  if (faceSelect) faceSelect.value = "";
+  const voiceSelect = document.getElementById("voiceSelectDropdown");
+  if (voiceSelect) voiceSelect.value = "";
+  const fpSelect = document.getElementById("fpSelectDropdown");
+  if (fpSelect) fpSelect.value = "";
+
+  // 5. Reset previews & restore initial placeholders
+  const video = document.getElementById("webcamVideo");
+  const faceCanvas = document.getElementById("capturedFaceCanvas");
+  const presetFaceImg = document.getElementById("presetFaceImg");
+  const camPlaceholder = document.getElementById("camPlaceholder");
+  if (video) video.style.display = "none";
+  if (faceCanvas) faceCanvas.style.display = "none";
+  if (presetFaceImg) { presetFaceImg.src = ""; presetFaceImg.style.display = "none"; }
+  if (camPlaceholder) camPlaceholder.style.display = "flex";
+
+  const voiceStatusTxt = document.getElementById("voiceStatusText");
+  if (voiceStatusTxt) voiceStatusTxt.innerText = "Ready: Speak passphrase 'Open security gate now'";
+
+  const fpPreview = document.getElementById("fpPreviewImg");
+  const fpPlaceholder = document.getElementById("fpPlaceholder");
+  if (fpPreview) { fpPreview.src = ""; fpPreview.style.display = "none"; }
+  if (fpPlaceholder) fpPlaceholder.style.display = "flex";
+
+  // 6. Reset UI banners, meters, cards
+  resetVerificationState();
+
+  // 7. Reset Header status to LOCKED and Unauthenticated
+  const gateStatusText = document.getElementById("gateStatusText");
+  if (gateStatusText) gateStatusText.innerText = "PERIMETER: LOCKED";
+  const gateStatusBadge = document.getElementById("gateStatusBadge");
+  if (gateStatusBadge) {
+    gateStatusBadge.style.borderColor = "var(--accent-red)";
+    gateStatusBadge.style.color = "var(--accent-red)";
+  }
+  const headerUser = document.getElementById("headerUserText");
+  if (headerUser) headerUser.innerText = "Unauthenticated";
+
+  // 8. Ensure view is back to gate verification
+  switchView("gate");
+
+  // 9. Refresh dashboard data in unauthenticated mode
+  await fetchDashboardData();
 }
