@@ -42,8 +42,8 @@ Tick when done **and** verified by a teammate.
 - [ ] Every member can explain the full system , **all**
 
 ### Bonuses
-- [x] **Bonus 1:** Speech command recognition connected to verification, role-based permissions, unverified users blocked , **M2**
-- [ ] **Bonus 2:** Real-time face (webcam) and voice (microphone) verification , **M3** (face live part with M1, voice live part with M2)
+- [ ] **Bonus 1:** Speech command recognition *(Excluded by design to focus on authentic voice biometrics)*
+- [x] **Bonus 2:** Real-time face (webcam) and voice (microphone) verification , **all**
 - [x] **Bonus 3:** Custom dataset collected and labeled by the team, used in experiments , **all**
 - [x] **Bonus 4:** Fingerprint modality integrated into the pipeline , **M1**
 

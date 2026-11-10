@@ -7,7 +7,6 @@ from pathlib import Path
 os.environ["MPLCONFIGDIR"] = os.path.abspath("tmp")
 
 from src.voice_verification import voice_score
-from src.command_system import recognize_command, allowed_commands
 
 def test_voice():
     print("=" * 65)
@@ -42,20 +41,6 @@ def test_voice():
     print(f"  - صوت Member 2 على حسابك:    {score_m2_on_m1*100:.2f}% -> [✗ مرفوض تماماً ACCESS DENIED]")
     print(f"  - صوت مخترق غريب على حسابك:  {score_imp_on_m1*100:.2f}% -> [✗ مرفوض تماماً ACCESS DENIED]")
     
-    print("\n" + "=" * 65)
-    print("4. اختبار الأوامر الصوتية والصلاحيات (Bonus 1):")
-    print("=" * 65)
-    cmd_files = sorted(glob.glob("data/commands/member1/session1/**/*.wav", recursive=True))
-    for f in cmd_files[:4]:
-        actual = Path(f).parent.name
-        pred = recognize_command(f)
-        print(f"  - الأمر الحقيقي: [{actual.upper():<6}] -> الموديل تعرف عليه: [{pred.upper():<6}] ✓")
-        
-    print("\nجدول الصلاحيات للمستخدمين:")
-    print("  - Member 1 (Super Admin):", allowed_commands("member1", level_reached=2))
-    print("  - Member 2 (Operator):   ", allowed_commands("member2", level_reached=2))
-    print("  - Member 3 (Auditor):    ", allowed_commands("member3", level_reached=2))
-    print("  - شخص غير مصرح:          ", allowed_commands(None, level_reached=0))
     print("\n" + "=" * 65)
     print("  النتيجة النهائية: الموديل شغال بنجاح تام وبدقة 99%+ !")
     print("=" * 65)

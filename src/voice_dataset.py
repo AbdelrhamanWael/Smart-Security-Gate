@@ -5,8 +5,6 @@ Part of: Hierarchical Multimodal Biometric Verification System
 Responsibilities:
 - Scans and loads audio files from the standardized directory structure:
     data/voice/{person_id}/{session_id}/*.wav
-    data/commands/{person_id}/{session_id}/{cmd}/*.wav
-    data/commands/unknown/{session_id}/*.wav
 - Extracts and caches 56-D voice feature vectors to ensure fast iteration.
 - Enforces session-based grouping (GroupKFold) to prevent data leakage.
 - Supports open-set evaluation by holding out unseen impostors.
@@ -31,7 +29,7 @@ class VoiceSample:
     filepath: Path
     person_id: str
     session_id: str
-    utterance_type: str  # "passphrase", "open", "lock", etc.
+    utterance_type: str = "passphrase"
     features: Optional[np.ndarray] = None
 
 
@@ -39,10 +37,7 @@ class VoiceDataset:
     def __init__(self, data_root: Union[str, Path] = "data"):
         self.data_root = Path(data_root)
         self.voice_root = self.data_root / "voice"
-        self.commands_root = self.data_root / "commands"
-
         self.voice_samples: List[VoiceSample] = []
-        self.command_samples: List[VoiceSample] = []
 
     def scan_voice_data(self) -> List[VoiceSample]:
         """Scan data/voice directory for passphrase recordings."""
@@ -64,39 +59,6 @@ class VoiceDataset:
         self.voice_samples = samples
         return samples
 
-    def scan_command_data(self) -> List[VoiceSample]:
-        """Scan data/commands directory for command recordings & unknown class."""
-        samples: List[VoiceSample] = []
-        if not self.commands_root.exists():
-            return samples
-
-        # 1. Standard commands: data/commands/{person_id}/{session_id}/{cmd}/*.wav
-        for wav_path in self.commands_root.glob("*/*/*/*.wav"):
-            cmd = wav_path.parent.name.lower()
-            session_id = wav_path.parent.parent.name
-            person_id = wav_path.parent.parent.parent.name
-            sample = VoiceSample(
-                filepath=wav_path,
-                person_id=person_id,
-                session_id=session_id,
-                utterance_type=cmd,
-            )
-            samples.append(sample)
-
-        # 2. Unknown class: data/commands/unknown/{session_id}/*.wav
-        for wav_path in self.commands_root.glob("unknown/*/*.wav"):
-            session_id = wav_path.parent.name
-            sample = VoiceSample(
-                filepath=wav_path,
-                person_id="unknown_speaker",
-                session_id=session_id,
-                utterance_type="unknown",
-            )
-            samples.append(sample)
-
-        self.command_samples = samples
-        return samples
-
     def load_features_for_samples(
         self,
         samples: List[VoiceSample],
@@ -110,7 +72,7 @@ class VoiceDataset:
           X: np.ndarray of shape (N, 56)
           person_ids: list of person_id strings
           session_ids: list of session_id strings
-          utterance_types: list of command/utterance strings
+          utterance_types: list of utterance strings
         """
         if cache_file and Path(cache_file).exists():
             if verbose:
@@ -188,8 +150,6 @@ def get_voice_verification_split(
     test_indices = []
 
     for i, (pid, sid) in enumerate(zip(person_ids, session_ids)):
-        is_genuine = (pid == target_user)
-
         if pid in unseen_impostors:
             # Unseen impostors go strictly to the final open-set test
             test_indices.append(i)
@@ -215,41 +175,4 @@ def get_voice_verification_split(
         groups_all[test_idx],
     )
 
-
-def get_command_split(
-    X: np.ndarray,
-    utterance_types: List[str],
-    session_ids: List[str],
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Builds speech command recognition split:
-    Classes: 'open', 'lock', 'logs', 'status', 'unknown'
-    Split: session1 and session2 for training, session3 for testing.
-
-    Returns:
-      (X_train, y_train, groups_train, X_test, y_test, groups_test)
-    """
-    train_idx = []
-    test_idx = []
-
-    for i, sid in enumerate(session_ids):
-        if sid in ("session1", "session2"):
-            train_idx.append(i)
-        else:
-            test_idx.append(i)
-
-    train_idx = np.array(train_idx)
-    test_idx = np.array(test_idx)
-
-    y_all = np.array(utterance_types)
-    groups_all = np.array(session_ids)
-
-    return (
-        X[train_idx],
-        y_all[train_idx],
-        groups_all[train_idx],
-        X[test_idx],
-        y_all[test_idx],
-        groups_all[test_idx],
-    )
 

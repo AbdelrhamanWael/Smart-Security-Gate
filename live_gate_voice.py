@@ -8,7 +8,6 @@ import sounddevice as sd
 os.environ["MPLCONFIGDIR"] = os.path.abspath("tmp")
 
 from src.voice_verification import voice_score
-from src.command_system import recognize_command, allowed_commands
 
 # ==========================================
 # CONFIGURATION
@@ -36,8 +35,6 @@ class LiveVoiceGate:
         
         # Verification results
         self.last_score = 0.0
-        self.last_cmd = "NONE"
-        self.allowed_cmds = allowed_commands(self.claimed_user, level_reached=2)
         self.result_message = "Press 'SPACE' to record your passphrase"
         
         # Stream for live audio
@@ -72,24 +69,17 @@ class LiveVoiceGate:
             if peak_val < MIN_SPEECH_PEAK:
                 self.state = "DENIED"
                 self.last_score = 0.0
-                self.last_cmd = "SILENCE"
-                self.allowed_cmds = []
                 self.result_message = "ACCESS DENIED! No speech detected (Dead Silence)"
                 return
             
             # 1. Compute verification score
             self.last_score = voice_score(audio, user_id=self.claimed_user)
             
-            # 2. Recognize potential command
-            self.last_cmd = recognize_command(audio)
-            
             if self.last_score >= SECURITY_THRESHOLD:
                 self.state = "VERIFIED"
-                self.allowed_cmds = allowed_commands(self.claimed_user, level_reached=2)
                 self.result_message = f"ACCESS GRANTED! Identity Verified: {self.claimed_user}"
             else:
                 self.state = "DENIED"
-                self.allowed_cmds = []
                 self.result_message = f"ACCESS DENIED! Score ({self.last_score*100:.1f}%) below threshold {SECURITY_THRESHOLD*100:.0f}%"
         else:
             self.state = "IDLE"
@@ -161,15 +151,15 @@ class LiveVoiceGate:
         cv2.rectangle(img, (210, 365), (210 + 120, 385), (100, 100, 110), 1)
         cv2.putText(img, "Threshold", (235, 403), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (140, 140, 140), 1)
 
-        # 5. Role & Speech Command Panel (Bonus 1)
+        # 5. Gate Access & Biometric Decision Panel
         cv2.rectangle(img, (400, 325), (WIN_W - 20, 445), (32, 32, 38), -1)
         cv2.rectangle(img, (400, 325), (WIN_W - 20, 445), (60, 60, 70), 1)
         
-        cv2.putText(img, "ROLE PERMISSIONS (Bonus 1)", (415, 348), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (180, 180, 180), 1)
-        cv2.putText(img, f"Detected Command: {self.last_cmd.upper()}", (415, 375), cv2.FONT_HERSHEY_SIMPLEX, 0.52, (240, 240, 240), 1)
-        
-        perm_str = ", ".join(self.allowed_cmds) if self.allowed_cmds else "None (Blocked)"
-        cv2.putText(img, f"Allowed: {perm_str}", (415, 405), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (0, 220, 180), 1)
+        cv2.putText(img, "GATE ACCESS DECISION", (415, 348), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (180, 180, 180), 1)
+        gate_state_str = "UNLOCKED (OPEN)" if self.state == "VERIFIED" else "LOCKED (RESTRICTED)"
+        gate_color = (0, 220, 0) if self.state == "VERIFIED" else (0, 0, 240)
+        cv2.putText(img, f"Gate Status: {gate_state_str}", (415, 378), cv2.FONT_HERSHEY_SIMPLEX, 0.50, gate_color, 2)
+        cv2.putText(img, f"Target User: {self.claimed_user.upper()}", (415, 405), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (0, 220, 180), 1)
         cv2.putText(img, "Passphrase: 'Open security gate now'", (415, 430), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (140, 140, 140), 1)
 
         # 6. Footer Controls
