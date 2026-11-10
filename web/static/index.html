@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Security Gate - Data Center Biometric System</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Top System Header -->
+  <header class="top-header">
+    <div class="brand">
+      <div class="logo-icon">🛡️</div>
+      <div>
+        <h1>Smart Security Gate <span>// Data Center</span></h1>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <div id="gateStatusBadge" class="system-status-pill">
+        <div class="pulse-dot"></div>
+        <span id="gateStatusText">PERIMETER: LOCKED</span>
+      </div>
+      <div id="activeUserBadge" style="font-size: 13px; font-family: var(--font-mono); color: var(--text-muted);">
+        User: <span id="headerUserText" style="color: var(--accent-cyan); font-weight: 700;">Unauthenticated</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Application Container -->
+  <main class="main-container">
+
+    <!-- View Navigation Tabs -->
+    <nav class="view-nav">
+      <button id="tabGateBtn" class="nav-tab-btn active" onclick="switchView('gate')">
+        <span>🚪</span> Biometric Gate (Verification)
+      </button>
+      <button id="tabDashBtn" class="nav-tab-btn" onclick="switchView('dashboard')">
+        <span>📊</span> Operational Dashboard & Data Sheet (RBAC)
+      </button>
+    </nav>
+
+    <!-- ====================================================================
+         VIEW 1: BIOMETRIC GATE VERIFICATION (CASCADE MODE D)
+         ==================================================================== -->
+    <section id="gateView" class="gate-grid">
+
+      <!-- Left Column: Modality Scanners & Inputs -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>⚡</span> Cascaded Biometric Pipeline
+          </div>
+          <span style="font-size: 12px; font-family: var(--font-mono); color: var(--text-muted);">Mode D // Traditional ML</span>
+        </div>
+
+        <!-- Claimed Identity Selector -->
+        <div class="user-select-bar">
+          <label>Claimed Identity:</label>
+          <div class="user-pill-group">
+            <button class="user-pill active" onclick="selectClaimedUser('member1', this)">Member 1 (Super Admin)</button>
+            <button class="user-pill" onclick="selectClaimedUser('member2', this)">Member 2 (Operator)</button>
+            <button class="user-pill" onclick="selectClaimedUser('impostor', this)">Intruder / Impostor</button>
+          </div>
+        </div>
+
+        <!-- Quick 1-Click Preset Demos -->
+        <div class="presets-box">
+          <div class="presets-title">⚡ Instant Presentation Presets (1-Click Test)</div>
+          <div class="presets-btns">
+            <button class="preset-btn" onclick="runPresetDemo('member1_genuine')">
+              <span>✅</span> Member 1 Genuine (All Pass)
+            </button>
+            <button class="preset-btn" onclick="runPresetDemo('member2_genuine')">
+              <span>✅</span> Member 2 Genuine (Operator Pass)
+            </button>
+            <button class="preset-btn attack" onclick="runPresetDemo('impostor_attack')">
+              <span>🚨</span> Unseen Impostor Attack (Denied L1)
+            </button>
+            <button class="preset-btn attack" onclick="runPresetDemo('spoof_voice')">
+              <span>⚠️</span> Right Face, Wrong Voice (Denied L2)
+            </button>
+          </div>
+        </div>
+
+        <!-- STAGE 1: FACE SCAN (LEVEL 1) -->
+        <div id="stageFaceCard" class="stage-card">
+          <div class="stage-header">
+            <span style="font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <span>👤</span> Level 1: Face Verification (Mode A)
+            </span>
+            <span id="badgeFace" class="stage-badge">STANDBY</span>
+          </div>
+          <div class="camera-container">
+            <video id="webcamVideo" autoplay playsinline muted></video>
+            <canvas id="capturedFaceCanvas" class="preview-canvas" style="display: none;"></canvas>
+            <img id="presetFaceImg" class="preview-canvas" style="display: none;" alt="Face Preset" />
+            <div class="radar-scan-overlay"></div>
+            <div id="radarLine" class="radar-scan-line"></div>
+          </div>
+          <div class="stage-actions">
+            <button id="btnStartCamera" class="btn-primary" onclick="toggleCamera()">
+              <span>📹</span> Start Webcam
+            </button>
+            <button id="btnCaptureFace" class="btn-secondary" onclick="captureFaceSnapshot()">
+              <span>📸</span> Capture Snapshot
+            </button>
+            <button class="btn-secondary" onclick="loadSampleFace()">
+              <span>📁</span> Use Sample File
+            </button>
+          </div>
+        </div>
+
+        <!-- STAGE 2: VOICE VERIFICATION (LEVEL 2) -->
+        <div id="stageVoiceCard" class="stage-card">
+          <div class="stage-header">
+            <span style="font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <span>🎙️</span> Level 2: Voice Verification & Early Fusion (Mode C)
+            </span>
+            <span id="badgeVoice" class="stage-badge">STANDBY</span>
+          </div>
+          <div class="audio-visual-box">
+            <canvas id="voiceWaveCanvas" class="mic-wave-canvas"></canvas>
+            <div id="voiceStatusText" style="position: absolute; font-size: 12px; font-family: var(--font-mono); color: var(--accent-cyan);">
+              Ready: Say 'Open security gate now'
+            </div>
+          </div>
+          <div class="stage-actions">
+            <button id="btnRecordVoice" class="btn-primary" onclick="toggleAudioRecording()">
+              <span>🎤</span> Record Passphrase (2.5s)
+            </button>
+            <button class="btn-secondary" onclick="loadSampleVoice()">
+              <span>📁</span> Use Sample Voice
+            </button>
+          </div>
+        </div>
+
+        <!-- STAGE 3: FINGERPRINT SCAN (LEVEL 3) -->
+        <div id="stageFpCard" class="stage-card">
+          <div class="stage-header">
+            <span style="font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+              <span>👆</span> Level 3: Fingerprint Biometrics (Bonus 4)
+            </span>
+            <span id="badgeFp" class="stage-badge">STANDBY</span>
+          </div>
+          <div class="fingerprint-box">
+            <img id="fpPreviewImg" class="fingerprint-img-preview" src="/static/img/fingerprint_placeholder.png" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2300e5ff\' stroke-width=\'1.5\'><path d=\'M12 2a10 10 0 0 0-10 10c0 5.5 4.5 10 10 10s10-4.5 10-10A10 10 0 0 0 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z\'/><path d=\'M12 6a6 6 0 0 0-6 6c0 3.3 2.7 6 6 6s6-2.7 6-6a6 6 0 0 0-6-6zm0 10c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z\'/></svg>'">
+            <div id="fpScanLine" class="radar-scan-line" style="display: none;"></div>
+          </div>
+          <div class="stage-actions">
+            <button class="btn-secondary" onclick="loadSampleFingerprint()">
+              <span>📁</span> Load Enrolled Fingerprint
+            </button>
+          </div>
+        </div>
+
+        <!-- Run Cascade Action Button -->
+        <button id="btnRunCascade" class="btn-cascade-full" onclick="executeFullCascade()">
+          🚀 Execute Hierarchical Verification (Cascade Mode D)
+        </button>
+      </div>
+
+      <!-- Right Column: Verification Results & Real-time Metrics -->
+      <div class="panel-card">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📊</span> Verification Results & Telemetry
+          </div>
+          <span id="clockDisplay" style="font-family: var(--font-mono); font-size: 13px; color: var(--accent-cyan);">--:--:--</span>
+        </div>
+
+        <!-- Big Decision Banner -->
+        <div id="decisionBanner" class="decision-banner idle">
+          <h2 id="decisionTitle">GATE SECURED</h2>
+          <p id="decisionDesc">Awaiting biometric inputs for identity evaluation.</p>
+        </div>
+
+        <!-- Modality Confidence Meters -->
+        <div style="margin-bottom: 24px;">
+          <h4 style="font-size: 13px; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 14px;">
+            Modality Match Confidence
+          </h4>
+
+          <!-- Face Score Meter -->
+          <div class="metric-row">
+            <div class="metric-label-bar">
+              <span>Face Confidence (T_low: <span id="tLowVal">50%</span>)</span>
+              <span id="faceScoreVal" style="font-family: var(--font-mono);">0.0%</span>
+            </div>
+            <div class="metric-bar-bg">
+              <div id="faceBarFill" class="metric-bar-fill"></div>
+            </div>
+          </div>
+
+          <!-- Early Fusion / Voice Score Meter -->
+          <div class="metric-row">
+            <div class="metric-label-bar">
+              <span>Voice & Early Fusion (T_fusion: <span id="tFusionVal">50%</span>)</span>
+              <span id="voiceScoreVal" style="font-family: var(--font-mono);">0.0%</span>
+            </div>
+            <div class="metric-bar-bg">
+              <div id="voiceBarFill" class="metric-bar-fill"></div>
+            </div>
+          </div>
+
+          <!-- Fingerprint Meter -->
+          <div class="metric-row">
+            <div class="metric-label-bar">
+              <span>Fingerprint Match (T_fp: <span id="tFpVal">20%</span>)</span>
+              <span id="fpScoreVal" style="font-family: var(--font-mono);">0.0%</span>
+            </div>
+            <div class="metric-bar-bg">
+              <div id="fpBarFill" class="metric-bar-fill"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cascade Stage Timing Breakdown -->
+        <div style="margin-bottom: 24px;">
+          <h4 style="font-size: 13px; text-transform: uppercase; color: var(--accent-cyan); margin-bottom: 8px;">
+            Cascade Compute Speed (Latency)
+          </h4>
+          <table class="timing-table">
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Time (ms)</th>
+                <th>Early Exit?</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Level 1: Face</td>
+                <td id="timeFace">--</td>
+                <td id="exitFace">--</td>
+              </tr>
+              <tr>
+                <td>Level 2: Voice & Fusion</td>
+                <td id="timeVoice">--</td>
+                <td id="exitVoice">--</td>
+              </tr>
+              <tr>
+                <td>Level 3: Fingerprint</td>
+                <td id="timeFp">--</td>
+                <td id="exitFp">--</td>
+              </tr>
+              <tr style="font-weight: 700; color: var(--accent-cyan);">
+                <td>Total Pipeline Latency</td>
+                <td id="timeTotal">--</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Enter Dashboard Direct Button -->
+        <div id="dashboardUnlockBox" style="display: none; text-align: center; margin-top: 20px;">
+          <button class="btn-primary" style="width: 100%; justify-content: center; padding: 13px;" onclick="switchView('dashboard')">
+            <span>🔓</span> Proceed to Operational Dashboard & Data Sheet →
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ====================================================================
+         VIEW 2: OPERATIONAL DASHBOARD & INTERACTIVE DATA SHEET (RBAC)
+         ==================================================================== -->
+    <section id="dashboardView" class="dashboard-view">
+
+      <!-- Active User & Role Banner -->
+      <div class="role-banner">
+        <div class="user-badge-role">
+          <div class="role-avatar" id="dashAvatar">🛡️</div>
+          <div class="role-info">
+            <h3 id="dashUserName">Member 1</h3>
+            <span id="dashRoleTitle">ROLE: SUPER ADMIN (FULL ACCESS)</span>
+          </div>
+        </div>
+        <div>
+          <span id="sheetEditPermissionPill" class="system-status-pill" style="border-color: var(--accent-cyan); color: var(--accent-cyan);">
+            ✏️ Full Edit Mode Enabled
+          </span>
+        </div>
+      </div>
+
+      <!-- Telemetry KPI Cards -->
+      <div class="telemetry-grid">
+        <div class="telem-card">
+          <div class="label">Server Room Temp</div>
+          <div class="val" id="telemTemp">21.8 °C</div>
+          <div class="sub">HVAC Closed Loop: Active</div>
+        </div>
+        <div class="telem-card">
+          <div class="label">Total Power Draw</div>
+          <div class="val" id="telemPower">18.25 kW</div>
+          <div class="sub">PUE Efficiency: 1.14</div>
+        </div>
+        <div class="telem-card">
+          <div class="label">Monitored Racks</div>
+          <div class="val" id="telemRacks">8 Racks</div>
+          <div class="sub">Online & Synced</div>
+        </div>
+        <div class="telem-card">
+          <div class="label">UPS Battery Status</div>
+          <div class="val" id="telemUps">99.4 %</div>
+          <div class="sub">Utility Grid Nominal</div>
+        </div>
+      </div>
+
+      <!-- Physical Gate & Vault Control Section -->
+      <div class="control-grid">
+        <!-- Perimeter Gate Control (Member 1 & Member 2) -->
+        <div class="control-box">
+          <div class="panel-title" style="margin-bottom: 12px;">
+            <span>🚪</span> Perimeter Security Gate Control
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            Accessible by: <strong>Member 1 (Super Admin)</strong> and <strong>Member 2 (Operator)</strong>.
+          </p>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn-primary" onclick="executeGateAction('perimeter_unlock')">
+              <span>🔓</span> Unlock Gate
+            </button>
+            <button class="btn-secondary" onclick="executeGateAction('perimeter_lock')">
+              <span>🔒</span> Lock Gate
+            </button>
+          </div>
+        </div>
+
+        <!-- High-Security Core Vault (Member 1 Only) -->
+        <div class="control-box vault">
+          <div class="panel-title" style="margin-bottom: 12px; color: #ff6b8b;">
+            <span>🔐</span> High-Security Core Server Vault
+          </div>
+          <p id="vaultAccessNotice" style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+            Restricted zone: <strong>Super Admin (Member 1) only</strong>.
+          </p>
+          <div style="display: flex; gap: 12px;">
+            <button id="btnVaultUnlock" class="btn-primary" style="background: #ff2d55; color: #fff;" onclick="executeGateAction('vault_unlock')">
+              <span>🔓</span> Unlock Vault
+            </button>
+            <button id="btnEmergencyLock" class="btn-danger" onclick="executeGateAction('emergency_lockdown')">
+              <span>🚨</span> EMERGENCY LOCKDOWN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           INTERACTIVE GOOGLE-SHEETS-STYLE DATA GRID
+           ==================================================================== -->
+      <div class="sheet-container">
+        <div class="sheet-toolbar">
+          <div class="sheet-title-info">
+            <span>📋</span>
+            <h3>Data Center Server Inventory & Rack Allocation</h3>
+            <span id="sheetAccessTag" style="font-size: 11px; padding: 3px 8px; border-radius: 4px; background: rgba(0, 229, 255, 0.15); color: var(--accent-cyan); font-family: var(--font-mono);">
+              Interactive Grid
+            </span>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <input type="text" id="sheetSearchInput" class="sheet-search" placeholder="🔍 Search Hostname, Rack, IP, or Role..." onkeyup="filterSheetTable()">
+          </div>
+        </div>
+
+        <div class="sheet-table-wrapper">
+          <table class="sheet-table" id="inventoryTable">
+            <thead>
+              <tr>
+                <th>SERVER ID</th>
+                <th>RACK UNIT</th>
+                <th>HOSTNAME</th>
+                <th>IP ADDRESS</th>
+                <th>ROLE / FUNCTION</th>
+                <th>POWER (kW)</th>
+                <th>TEMP (°C)</th>
+                <th>STATUS</th>
+                <th>ADMIN NOTES</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryTableBody">
+              <!-- Dynamically populated via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Security Audit Trail Table -->
+      <div class="panel-card" style="margin-bottom: 24px;">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📜</span> Security Access Audit Trail
+          </div>
+          <span style="font-size: 12px; font-family: var(--font-mono); color: var(--text-muted);">Real-time Biometric Access Events</span>
+        </div>
+        <div style="overflow-x: auto;">
+          <table class="timing-table" style="font-size: 13px;">
+            <thead>
+              <tr>
+                <th>TIMESTAMP</th>
+                <th>CLAIMED IDENTITY</th>
+                <th>RESULT</th>
+                <th>LEVEL REACHED</th>
+                <th>FACE %</th>
+                <th>VOICE %</th>
+                <th>FINGERPRINT %</th>
+                <th>ROLE ASSIGNED</th>
+                <th>LATENCY</th>
+              </tr>
+            </thead>
+            <tbody id="auditTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Edit Row Modal (Google-Sheets Style Inline Editing) -->
+  <div id="editModal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modalServerTitle" style="color: var(--accent-cyan); font-size: 16px;">Edit Server Details</h3>
+        <button onclick="closeEditModal()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✕</button>
+      </div>
+      <form id="editServerForm" onsubmit="saveServerEdit(event)">
+        <input type="hidden" id="editServerId">
+        <div class="form-group">
+          <label>Rack Unit</label>
+          <input type="text" id="editServerRack" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Hostname</label>
+          <input type="text" id="editServerHostname" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>IP Address</label>
+          <input type="text" id="editServerIp" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Role / Function</label>
+          <input type="text" id="editServerRole" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="editServerStatus" class="form-control">
+            <option value="OPTIMAL">OPTIMAL</option>
+            <option value="STANDBY">STANDBY</option>
+            <option value="MAINTENANCE">MAINTENANCE</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Admin Notes</label>
+          <textarea id="editServerNotes" class="form-control" rows="2"></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px;">
+          <button type="button" class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+          <button type="submit" class="btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
+

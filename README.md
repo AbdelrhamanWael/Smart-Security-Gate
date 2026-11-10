@@ -34,6 +34,9 @@ This system provides hierarchical biometric authentication using traditional mac
 ## Running the System
 
 ```bash
+# Launch Modern Web GUI (Biometric Gate + Google-Sheets Server Grid + RBAC)
+python run_web_gate.py
+
 # Member 1 Experiments (Face Mode A, E1 ablation, Bonus 4 Fingerprint)
 python run_member1.py
 python run_experiment_e1.py
