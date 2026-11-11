@@ -514,3 +514,4 @@ def build_master_defense_docx():
 
 if __name__ == "__main__":
     build_master_defense_docx()
+
