@@ -1,3 +1,21 @@
+"""
+live_gate_voice.py - Real-Time Microphone Biometric Gate (Bonus 2)
+Part of: Hierarchical Multimodal Biometric Verification System
+
+Features:
+- Live real-time audio waveform visualizer using sounddevice & OpenCV.
+- 16 kHz Mono resampling with automatic VAD (Voice Activity Detection).
+- 56-D acoustic feature extraction (MFCC + Delta-MFCC + ZCR + RMS Energy).
+- Identity verification against SVM (RBF) acoustic models.
+- Interactive controls:
+    [SPACE] Countdown & Record 2.5s passphrase ('Open security gate now')
+    [1] Claim: Abdelrahman Wael (Member 1 - Super Admin)
+    [2] Claim: Hashem (Member 2 - Operator)
+    [3] Claim: Hagar (Member 3 - Auditor)
+    [+] Increase threshold | [-] Decrease threshold
+    [Q] Quit / Exit
+"""
+
 import os
 import sys
 import time
@@ -13,18 +31,22 @@ from src.voice_verification import voice_score
 # CONFIGURATION
 # ==========================================
 SAMPLE_RATE = 16000
-DURATION = 2.5                 # Duration of voice sample in seconds
-SECURITY_THRESHOLD = 0.60      # Realistic Security Threshold (60%)
-MIN_SPEECH_PEAK = 0.005        # Minimum peak required to consider that a human spoke
-CLAIMED_USER = "member1"       # Default user (press 1, 2, 3 to switch)
-
-# Window dimensions
+DURATION = 2.5                 # Duration of voice recording in seconds
+DEFAULT_THRESHOLD = 0.55       # Balanced security threshold (55%)
+MIN_SPEECH_PEAK = 0.005        # Minimum peak required to detect speech
 WIN_W, WIN_H = 800, 520
 # ==========================================
 
+USER_PROFILES = {
+    "member1": {"name": "Abdelrahman Wael", "role": "Super Admin"},
+    "member2": {"name": "Hashem", "role": "Operator"},
+    "member3": {"name": "Hagar", "role": "Auditor"},
+}
+
 class LiveVoiceGate:
     def __init__(self):
-        self.claimed_user = CLAIMED_USER
+        self.claimed_user = "member1"
+        self.security_threshold = DEFAULT_THRESHOLD
         self.state = "IDLE"  # "IDLE", "COUNTDOWN", "RECORDING", "VERIFIED", "DENIED"
         self.countdown_start = 0
         self.countdown_val = 3
@@ -35,7 +57,7 @@ class LiveVoiceGate:
         
         # Verification results
         self.last_score = 0.0
-        self.result_message = "Press 'SPACE' to record your passphrase"
+        self.result_message = "Press 'SPACE' to record passphrase: 'Open security gate now'"
         
         # Stream for live audio
         self.stream = None
@@ -57,7 +79,7 @@ class LiveVoiceGate:
         self.state = "RECORDING"
         self.audio_frames = []
         self.record_start = time.time()
-        self.result_message = "RECORDING: Say 'Open security gate now'..."
+        self.result_message = "RECORDING: Speak clearly: 'Open security gate now'..."
 
     def finish_recording(self):
         self.state = "ANALYZING"
@@ -69,51 +91,51 @@ class LiveVoiceGate:
             if peak_val < MIN_SPEECH_PEAK:
                 self.state = "DENIED"
                 self.last_score = 0.0
-                self.result_message = "ACCESS DENIED! No speech detected (Dead Silence)"
+                self.result_message = "ACCESS DENIED: No speech detected (Microphone Silent)"
                 return
             
-            # 1. Compute verification score
+            # Compute verification score
             self.last_score = voice_score(audio, user_id=self.claimed_user)
             
-            if self.last_score >= SECURITY_THRESHOLD:
+            if self.last_score >= self.security_threshold:
                 self.state = "VERIFIED"
-                self.result_message = f"ACCESS GRANTED! Identity Verified: {self.claimed_user}"
+                self.result_message = f"ACCESS GRANTED! Identity Verified: {USER_PROFILES[self.claimed_user]['name']}"
             else:
                 self.state = "DENIED"
-                self.result_message = f"ACCESS DENIED! Score ({self.last_score*100:.1f}%) below threshold {SECURITY_THRESHOLD*100:.0f}%"
+                self.result_message = f"ACCESS DENIED! Score ({self.last_score*100:.1f}%) below {self.security_threshold*100:.0f}% threshold"
         else:
             self.state = "IDLE"
-            self.result_message = "No audio captured. Try again."
+            self.result_message = "No audio captured. Press SPACE to try again."
 
     def draw_ui(self):
         img = np.zeros((WIN_H, WIN_W, 3), dtype=np.uint8)
-        img[:] = (24, 24, 28)  # Modern dark background
+        img[:] = (20, 22, 28)  # Modern dark background
         
         # 1. Header Box
-        header_color = (0, 220, 0) if self.state == "VERIFIED" else ((0, 0, 240) if self.state == "DENIED" else (255, 170, 0))
-        cv2.rectangle(img, (20, 15), (WIN_W - 20, 85), (35, 35, 42), -1)
+        header_color = (0, 230, 0) if self.state == "VERIFIED" else ((0, 0, 240) if self.state == "DENIED" else (0, 200, 255))
+        cv2.rectangle(img, (20, 15), (WIN_W - 20, 85), (30, 34, 42), -1)
         cv2.rectangle(img, (20, 15), (WIN_W - 20, 85), header_color, 2)
         
         cv2.putText(img, "SMART SECURITY GATE: LIVE VOICE VERIFICATION", (35, 45),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.75, (240, 240, 240), 2)
-        cv2.putText(img, f"Claimed Identity: {self.claimed_user.upper()} | Threshold: {SECURITY_THRESHOLD*100:.0f}%", 
-                    (35, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (180, 180, 180), 1)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.72, (240, 240, 240), 2)
+        cv2.putText(img, f"Claimed Identity: {USER_PROFILES[self.claimed_user]['name']} ({USER_PROFILES[self.claimed_user]['role']}) | Threshold: {self.security_threshold*100:.0f}%", 
+                    (35, 72), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (180, 180, 180), 1)
 
         # 2. Main Status Banner
-        status_bg = (15, 60, 15) if self.state == "VERIFIED" else ((15, 15, 70) if self.state == "DENIED" else (40, 35, 20))
+        status_bg = (15, 60, 15) if self.state == "VERIFIED" else ((15, 15, 70) if self.state == "DENIED" else (35, 30, 15))
         cv2.rectangle(img, (20, 95), (WIN_W - 20, 160), status_bg, -1)
         cv2.rectangle(img, (20, 95), (WIN_W - 20, 160), header_color, 1)
         
         cv2.putText(img, f"STATUS: {self.state}", (35, 130),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.9, header_color, 2)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.85, header_color, 2)
         cv2.putText(img, self.result_message, (35, 152),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.52, (220, 220, 220), 1)
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.48, (220, 220, 220), 1)
 
         # 3. Live Waveform Visualizer Area
-        cv2.rectangle(img, (20, 175), (WIN_W - 20, 310), (18, 18, 22), -1)
-        cv2.rectangle(img, (20, 175), (WIN_W - 20, 310), (60, 60, 70), 1)
-        cv2.putText(img, "LIVE MICROPHONE WAVEFORM", (35, 195),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.45, (130, 130, 140), 1)
+        cv2.rectangle(img, (20, 175), (WIN_W - 20, 310), (16, 18, 24), -1)
+        cv2.rectangle(img, (20, 175), (WIN_W - 20, 310), (50, 55, 68), 1)
+        cv2.putText(img, "LIVE MICROPHONE INPUT (16 kHz MONO PCM)", (35, 195),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.42, (120, 130, 150), 1)
 
         # Draw waveform line
         center_y = 242
@@ -135,48 +157,53 @@ class LiveVoiceGate:
             cv2.rectangle(img, (40, 298), (40 + bar_w, 304), (0, 120, 255), -1)
 
         # 4. Score & Metrics Panel
-        cv2.rectangle(img, (20, 325), (380, 445), (32, 32, 38), -1)
-        cv2.rectangle(img, (20, 325), (380, 445), (60, 60, 70), 1)
+        cv2.rectangle(img, (20, 325), (380, 445), (28, 32, 40), -1)
+        cv2.rectangle(img, (20, 325), (380, 445), (55, 60, 72), 1)
         
-        cv2.putText(img, "BIOMETRIC MATCH SCORE", (35, 348), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (180, 180, 180), 1)
+        cv2.putText(img, "VOICE MATCH CONFIDENCE", (35, 348), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (170, 170, 170), 1)
         score_pct = self.last_score * 100
-        score_col = (0, 220, 0) if self.last_score >= SECURITY_THRESHOLD else (0, 0, 240)
-        cv2.putText(img, f"{score_pct:.1f}%", (35, 395), cv2.FONT_HERSHEY_SIMPLEX, 1.4, score_col, 3)
-        cv2.putText(img, f"Raw Score: {self.last_score:.4f} / 1.0", (35, 428), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (160, 160, 160), 1)
+        score_col = (0, 230, 0) if self.last_score >= self.security_threshold else (0, 0, 240)
+        cv2.putText(img, f"{score_pct:.1f}%", (35, 395), cv2.FONT_HERSHEY_SIMPLEX, 1.3, score_col, 3)
+        cv2.putText(img, f"Raw Score: {self.last_score:.4f} / 1.0", (35, 428), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (150, 150, 150), 1)
 
         # Score bar
-        bar_fill = int(120 * min(1.0, self.last_score))
-        cv2.rectangle(img, (210, 365), (210 + 120, 385), (50, 50, 60), -1)
+        bar_fill = int(120 * min(1.0, max(0.0, self.last_score)))
+        cv2.rectangle(img, (210, 365), (210 + 120, 385), (45, 48, 58), -1)
         cv2.rectangle(img, (210, 365), (210 + bar_fill, 385), score_col, -1)
-        cv2.rectangle(img, (210, 365), (210 + 120, 385), (100, 100, 110), 1)
-        cv2.putText(img, "Threshold", (235, 403), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (140, 140, 140), 1)
+        cv2.rectangle(img, (210, 365), (210 + 120, 385), (90, 95, 105), 1)
+        thresh_x = int(210 + 120 * self.security_threshold)
+        cv2.line(img, (thresh_x, 363), (thresh_x, 387), (255, 255, 255), 2)
+        cv2.putText(img, f"Thresh ({self.security_threshold*100:.0f}%)", (215, 405), cv2.FONT_HERSHEY_SIMPLEX, 0.38, (140, 140, 140), 1)
 
         # 5. Gate Access & Biometric Decision Panel
-        cv2.rectangle(img, (400, 325), (WIN_W - 20, 445), (32, 32, 38), -1)
-        cv2.rectangle(img, (400, 325), (WIN_W - 20, 445), (60, 60, 70), 1)
+        cv2.rectangle(img, (400, 325), (WIN_W - 20, 445), (28, 32, 40), -1)
+        cv2.rectangle(img, (400, 325), (WIN_W - 20, 445), (55, 60, 72), 1)
         
-        cv2.putText(img, "GATE ACCESS DECISION", (415, 348), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (180, 180, 180), 1)
-        gate_state_str = "UNLOCKED (OPEN)" if self.state == "VERIFIED" else "LOCKED (RESTRICTED)"
-        gate_color = (0, 220, 0) if self.state == "VERIFIED" else (0, 0, 240)
-        cv2.putText(img, f"Gate Status: {gate_state_str}", (415, 378), cv2.FONT_HERSHEY_SIMPLEX, 0.50, gate_color, 2)
-        cv2.putText(img, f"Target User: {self.claimed_user.upper()}", (415, 405), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (0, 220, 180), 1)
-        cv2.putText(img, "Passphrase: 'Open security gate now'", (415, 430), cv2.FONT_HERSHEY_SIMPLEX, 0.42, (140, 140, 140), 1)
+        cv2.putText(img, "GATE ACCESS DECISION", (415, 348), cv2.FONT_HERSHEY_SIMPLEX, 0.48, (170, 170, 170), 1)
+        gate_state_str = "UNLOCKED (GRANTED)" if self.state == "VERIFIED" else "LOCKED (DENIED)"
+        gate_color = (0, 230, 0) if self.state == "VERIFIED" else (0, 0, 240)
+        cv2.putText(img, f"Gate: {gate_state_str}", (415, 378), cv2.FONT_HERSHEY_SIMPLEX, 0.48, gate_color, 2)
+        cv2.putText(img, f"User: {USER_PROFILES[self.claimed_user]['name']}", (415, 405), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 220, 255), 1)
+        cv2.putText(img, "Passphrase: 'Open security gate now'", (415, 430), cv2.FONT_HERSHEY_SIMPLEX, 0.40, (140, 140, 140), 1)
 
         # 6. Footer Controls
-        cv2.putText(img, "[SPACE]: Record Passphrase  |  [1/2/3]: Switch User  |  [Q]: Quit",
-                    (35, 485), cv2.FONT_HERSHEY_SIMPLEX, 0.55, (200, 200, 200), 1)
+        cv2.rectangle(img, (20, 465), (WIN_W - 20, 505), (15, 18, 24), -1)
+        cv2.rectangle(img, (20, 465), (WIN_W - 20, 505), (50, 55, 68), 1)
+        cv2.putText(img, "[SPACE] Record Passphrase  |  [1/2/3] Switch User  |  [+/-] Threshold  |  [Q] Exit",
+                    (35, 490), cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 220, 255), 1)
 
         return img
 
     def run(self):
-        print("=" * 60)
-        print(" STARTING LIVE VOICE GATE GUI ")
-        print(" - Press 'SPACE' to record your 2.5s passphrase")
-        print(" - Press '1' for Member 1 | '2' for Member 2 | '3' for Member 3")
-        print(" - Press 'q' to exit")
-        print("=" * 60)
+        print("=" * 65)
+        print("        SMART SECURITY GATE: REAL-TIME VOICE VERIFIER       ")
+        print(" Controls:")
+        print("   [SPACE] Start 3s countdown & record 2.5s passphrase")
+        print("   [1] Abdelrahman Wael  |  [2] Hashem  |  [3] Hagar")
+        print("   [+] Increase Thresh   |  [-] Decrease Thresh")
+        print("   [Q] Exit")
+        print("=" * 65)
 
-        # Start live mic stream
         self.stream = sd.InputStream(
             samplerate=SAMPLE_RATE,
             channels=1,
@@ -186,11 +213,10 @@ class LiveVoiceGate:
         
         with self.stream:
             while True:
-                # Handle states
                 if self.state == "COUNTDOWN":
                     elapsed = time.time() - self.countdown_start
                     self.countdown_val = int(3.0 - elapsed) + 1
-                    self.result_message = f"GET READY: Recording in {self.countdown_val}s..."
+                    self.result_message = f"GET READY: Speak passphrase in {self.countdown_val}s..."
                     if elapsed >= 3.0:
                         self.start_recording()
 
@@ -198,13 +224,11 @@ class LiveVoiceGate:
                     if time.time() - self.record_start >= DURATION:
                         self.finish_recording()
 
-                # Render frame
                 frame = self.draw_ui()
                 cv2.imshow("Smart Security Gate - Live Voice Verification", frame)
 
-                # Key handling
                 key = cv2.waitKey(20) & 0xFF
-                if key == ord('q'):
+                if key in (ord('q'), ord('Q'), 27):
                     break
                 elif key == ord(' '):
                     if self.state not in ("COUNTDOWN", "RECORDING"):
@@ -213,19 +237,27 @@ class LiveVoiceGate:
                 elif key == ord('1'):
                     self.claimed_user = "member1"
                     self.state = "IDLE"
-                    self.result_message = f"Switched user to {self.claimed_user.upper()}"
+                    self.result_message = f"Switched identity to: {USER_PROFILES['member1']['name']}"
+                    print(f"[SWITCH] Claimed Identity: {USER_PROFILES['member1']['name']}")
                 elif key == ord('2'):
                     self.claimed_user = "member2"
                     self.state = "IDLE"
-                    self.result_message = f"Switched user to {self.claimed_user.upper()}"
+                    self.result_message = f"Switched identity to: {USER_PROFILES['member2']['name']}"
+                    print(f"[SWITCH] Claimed Identity: {USER_PROFILES['member2']['name']}")
                 elif key == ord('3'):
                     self.claimed_user = "member3"
                     self.state = "IDLE"
-                    self.result_message = f"Switched user to {self.claimed_user.upper()}"
+                    self.result_message = f"Switched identity to: {USER_PROFILES['member3']['name']}"
+                    print(f"[SWITCH] Claimed Identity: {USER_PROFILES['member3']['name']}")
+                elif key in (ord('+'), ord('=')):
+                    self.security_threshold = min(0.95, round(self.security_threshold + 0.05, 2))
+                    print(f"[CONFIG] Voice Threshold increased to: {self.security_threshold * 100:.0f}%")
+                elif key in (ord('-'), ord('_')):
+                    self.security_threshold = max(0.30, round(self.security_threshold - 0.05, 2))
+                    print(f"[CONFIG] Voice Threshold decreased to: {self.security_threshold * 100:.0f}%")
 
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     app = LiveVoiceGate()
     app.run()
-

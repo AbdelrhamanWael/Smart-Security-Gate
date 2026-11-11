@@ -281,3 +281,4 @@ flowchart TD
 - عند سؤالك: *"أين كود استخراج الصوت وكيف تم بدون ديب ليرنينج؟"* $\rightarrow$ أجب: في `src/voice_features.py` باستخدام معالجة الإشارات التقليدية (FFT و Mel-filterbanks من SciPy و NumPy).
 - عند سؤالك: *"أين يتم تطبيق سياسة الـ 2 من 3؟"* $\rightarrow$ أجب: في دالة `api_verify_cascade` بملف `web/server.py`.
 - عند سؤالك: *"أين مصفوفات الالتباس والـ ROC؟"* $\rightarrow$ أجب: في مجلد `results/m3/figures/` ومضمنة بالكامل داخل تقرير الوورد.
+
