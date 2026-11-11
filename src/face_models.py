@@ -1,6 +1,7 @@
 import os
 import sys
 import joblib
+import cv2
 import numpy as np
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
@@ -88,20 +89,28 @@ def save_model(pipeline, user_id="member1", model_type="svm", output_dir="models
 
 def face_score(image_bgr, user_id="member1", model_type="svm", models_dir="models"):
     """
-    The function Member 3 calls.
-    Returns: float (0.0 to 1.0 match probability). Returns 0.0 if no face detected.
+    Computes biometric match score (probability 0.0 to 1.0) for the claimed user.
+    Uses mirror-invariance (testing both raw and horizontally flipped face) so webcams
+    that invert left/right still achieve full recognition accuracy.
     """
     face_gray = crop_face(image_bgr)
     if face_gray is None:
         return 0.0
-        
-    feats = extract_face_features(face_gray, mode="both")
+
     key = f"{user_id}_{model_type}"
     if key not in _LOADED_MODELS:
         path = os.path.join(models_dir, f"face_{user_id}_{model_type}.joblib")
         if not os.path.exists(path):
             raise FileNotFoundError(f"Model not found: {path}. Train it first.")
         _LOADED_MODELS[key] = joblib.load(path)
-        
+
     model = _LOADED_MODELS[key]
-    return float(model.predict_proba([feats])[0, 1])
+
+    # Mirror invariance: test both raw and flipped crops to handle mirrored webcams
+    feats_raw = extract_face_features(face_gray, mode="both")
+    prob_raw = float(model.predict_proba([feats_raw])[0, 1])
+
+    feats_flip = extract_face_features(cv2.flip(face_gray, 1), mode="both")
+    prob_flip = float(model.predict_proba([feats_flip])[0, 1])
+
+    return max(prob_raw, prob_flip)

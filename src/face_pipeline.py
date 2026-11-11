@@ -13,33 +13,49 @@ face_cascade = cv2.CascadeClassifier(_CASCADE_PATH)
 # CLAHE normalizes local lighting across face regions much better than global equalizeHist on live webcams
 _CLAHE = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 
-def crop_face(img_bgr , size=(128 , 128), return_box=False):
-    if img_bgr is None: 
+def crop_face(img_bgr, size=(128, 128), return_box=False):
+    if img_bgr is None:
         return (None, None) if return_box else None
-    
 
-    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
-    ## detect the face in the image using the cascade classifier
-    ##scale Factor: Parameter specifying how much the image size is reduced at each image scale.
-    ##minNeighbors: Parameter specifying how many neighbors each candidate rectangle should have to retain it
-    ##minSize: Minimum possible object size. Objects smaller than that are ignored.
-    faces = face_cascade.detectMultiScale(gray , scaleFactor=1.1, minNeighbors=4 , minSize=(40,40))
+    if len(img_bgr.shape) == 3:
+        gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = img_bgr.copy()
+
+    # Pass 1: Standard detection
+    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=4, minSize=(40, 40))
+
+    # Pass 2: Sensitive detection for webcam frames with lighting or angle variations
     if len(faces) == 0:
-        return (None, None) if return_box else None
+        faces = face_cascade.detectMultiScale(gray, scaleFactor=1.05, minNeighbors=3, minSize=(30, 30))
 
-    x,y,w,h = max(faces, key=lambda f: f[2]*f[3])  ##get the largest face detected
-    
-    # Trim 8% outer border of the Haar box so room background/walls don't pollute HOG/LBP on live webcam
-    pad_x = int(w * 0.08)
-    pad_y = int(h * 0.08)
-    x1 = max(0, x + pad_x)
-    y1 = max(0, y + pad_y)
-    x2 = min(gray.shape[1], x + w - pad_x)
-    y2 = min(gray.shape[0], y + h - pad_y)
-    
-    cropped = gray[y1:y2 , x1:x2] ##crop the inner face region
-    resized = cv2.resize(cropped, size, interpolation=cv2.INTER_AREA) ##resize the cropped face to the desired size
-    enhanced = _CLAHE.apply(resized) ##apply CLAHE adaptive contrast enhancement for webcam lighting invariance
+    # Pass 3: Detection after CLAHE local contrast enhancement
+    if len(faces) == 0:
+        clahe_gray = _CLAHE.apply(gray)
+        faces = face_cascade.detectMultiScale(clahe_gray, scaleFactor=1.05, minNeighbors=3, minSize=(30, 30))
+
+    if len(faces) == 0:
+        # If the input image is already a close-up cropped face (e.g. dataset sample)
+        # fallback to center region so verification doesn't fail on cropped inputs
+        h_g, w_g = gray.shape
+        if h_g >= 40 and w_g >= 40:
+            x, y, w, h = 0, 0, w_g, h_g
+            cropped = gray
+        else:
+            return (None, None) if return_box else None
+    else:
+        x, y, w, h = max(faces, key=lambda f: f[2] * f[3])
+        # Trim 8% outer border of the Haar box so room background doesn't pollute HOG/LBP
+        pad_x = int(w * 0.08)
+        pad_y = int(h * 0.08)
+        x1 = max(0, x + pad_x)
+        y1 = max(0, y + pad_y)
+        x2 = min(gray.shape[1], x + w - pad_x)
+        y2 = min(gray.shape[0], y + h - pad_y)
+        cropped = gray[y1:y2, x1:x2]
+
+    resized = cv2.resize(cropped, size, interpolation=cv2.INTER_AREA)
+    enhanced = _CLAHE.apply(resized)
 
     if return_box:
         return enhanced, (x, y, w, h)

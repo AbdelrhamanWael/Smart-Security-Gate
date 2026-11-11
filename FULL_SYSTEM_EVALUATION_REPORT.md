@@ -191,3 +191,4 @@ The evaluation demonstrates that the **Smart Security Gate** system fulfills all
 1. **$100\%$ Traditional ML:** Built strictly with OpenCV, SciPy, NumPy, and Scikit-Learn without neural networks.
 2. **Proven Multimodal Superiority:** Early Feature Fusion and Hierarchical Cascading eliminate unimodal vulnerabilities, achieving **$0.0\%$ FAR**, **$0.0\%$ EER**, and **$100.0\%$ ROC-AUC**.
 3. **Enterprise Operational Feasibility:** Sub-80ms total latency, live WebRTC camera/audio recording, and role-based access control suitable for high-security data centers.
+
